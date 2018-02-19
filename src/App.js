@@ -1,6 +1,7 @@
 import React from 'react';
 import { PageHeader } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
+import { Studio } from './components';
 
 const fonts = css`
   .personal {
@@ -31,6 +32,7 @@ const App = () => (
         </PageHeader>
       </header>
       <main>
+        <Studio />
       </main>
     </AppInner>
   </AppOuter>
