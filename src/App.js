@@ -1,16 +1,39 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { PageHeader } from 'react-bootstrap';
+import styled, { css } from 'styled-components';
+
+const fonts = css`
+  .personal {
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .string-sync {
+    font-family: Helvetica Neue, sans-serif;
+    font-weight: 100;
+  }
+`;
+const AppOuter = styled.div`
+  max-width: 980px;
+  margin: 0 auto;
+  ${fonts}
+`;
+const AppInner = styled.div`
+`;
+const AppHeader = styled.div`
+`;
 
 const App = () => (
-  <div>
-    <header>
-      <h1>Story Teller</h1>
-      <p>Hello, world!</p>
-    </header>
-    <main>
-    </main>
-  </div>
+  <AppOuter>
+    <AppInner>
+      <header className="App-header">
+        <PageHeader>
+          story teller
+        </PageHeader>
+      </header>
+      <main>
+      </main>
+    </AppInner>
+  </AppOuter>
 );
 
 export default App;
