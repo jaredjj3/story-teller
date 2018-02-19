@@ -20,8 +20,6 @@ const AppOuter = styled.div`
 `;
 const AppInner = styled.div`
 `;
-const AppHeader = styled.div`
-`;
 
 const App = () => (
   <AppOuter>
