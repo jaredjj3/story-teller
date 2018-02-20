@@ -8,6 +8,12 @@ const Content = styled.div`
   justify-content: space-between;
   align-items: center;
 
+  div {
+    height: 50px;
+    width: 50px;
+    border: 1px solid black;
+  }
+
   span {
     margin-top: 7px;
   }
@@ -17,19 +23,19 @@ const Palette = ({ backgroundColor, color, alternativeColor}) => (
   <Row>
     <Col xs={4} sm={4} md={4} lg={4} xl={4}>
       <Content>
-        <div style={{ height: 50, width: 50, background: backgroundColor }} />
+        <div style={{ background: backgroundColor }} />
         <span><small>{backgroundColor}</small></span>
       </Content>
     </Col>
     <Col xs={4} sm={4} md={4} lg={4} xl={4}>
       <Content>
-        <div style={{ height: 50, width: 50, background: color }} />
+        <div style={{ background: color }} />
         <span><small>{color}</small></span>
       </Content>
     </Col>
     <Col xs={4} sm={4} md={4} lg={4} xl={4}>
       <Content>
-        <div style={{ height: 50, width: 50, background: alternativeColor }} />
+        <div style={{ background: alternativeColor }} />
         <span><small>{alternativeColor}</small></span>
       </Content>
     </Col>

@@ -1,11 +1,16 @@
 import React from 'react';
-import styled from 'styled-components';
+import { compose, withState, withProps, withHandlers, lifecycle } from 'recompose';
 import html2canvas from 'html2canvas'
 import $ from 'jquery';
 import ImagePalette from 'react-image-palette';
 import { Content, Theme, Preview, Palette } from '../';
-import { compose, withState, withProps, withHandlers, lifecycle } from 'recompose';
 import { Row, Col } from 'reactstrap';
+
+const DEFAULT_PALETTE = Object.freeze({
+  backgroundColor: '#ffffff',
+  color: '#222222',
+  alternativeColor: '#efefef'
+});
 
 const enhance = compose(
   withState('text1', 'setText1', 'The Less I Know the Better'),
@@ -64,7 +69,7 @@ const enhance = compose(
         width: '0'
       }, 50);
       props.setPlaying(false);
-    },
+    }
   }),
   lifecycle({
     componentDidMount() {
@@ -88,6 +93,7 @@ const Studio = props => (
           crossOrigin
           image={props.imgSrc}
           render={Palette}
+          default={{ DEFAULT_PALETTE }}
         />
       </Col>
       <Col xs={6} md={6} lg={6}>
