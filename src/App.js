@@ -26,10 +26,14 @@ const fonts = css`
   }
 `;
 const AppOuter = styled.div`
+  min-width: 700px;
   max-width: 980px;
-  margin: 0 auto;
+  margin: 0 200px 200px 200px;
 
   ${fonts}
+`;
+const AppInner = styled.div`
+  margin: 0 auto;
 `;
 const AppHeader = styled.header`
   margin-top: 20px;
@@ -37,7 +41,7 @@ const AppHeader = styled.header`
 
 const App = () => (
   <AppOuter>
-    <div>
+    <AppInner>
       <AppHeader className="App-header">
         <h1>story teller</h1>
         <p>tell stories. instagram stories.</p>
@@ -46,7 +50,7 @@ const App = () => (
       <main>
         <Studio />
       </main>
-    </div>
+    </AppInner>
   </AppOuter>
 );
 
