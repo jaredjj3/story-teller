@@ -35,18 +35,6 @@ const Content = props => (
             onChange={props.handleChange('setImgSrc')}
           />
         </FormGroup>
-        <FormGroup>
-          <Label for="time">time</Label>
-          <InputGroup>
-            <Input
-              id="time"
-              type="number"
-              value={props.timeMs}
-              onChange={props.handleChange('setTimeMs')}
-            />
-            <InputGroupAddon addonType="append">ms</InputGroupAddon>
-          </InputGroup>
-        </FormGroup>
       </Col>
       <Col xs={6} md={6} lg={6}>
         <FormGroup>
@@ -78,6 +66,18 @@ const Content = props => (
             <option value="4">sm</option>
             <option value="5">xs</option>
           </Input>
+        </FormGroup>
+        <FormGroup>
+          <Label for="time">time</Label>
+          <InputGroup>
+            <Input
+              id="time"
+              type="number"
+              value={props.timeMs}
+              onChange={props.handleChange('setTimeMs')}
+            />
+            <InputGroupAddon addonType="append">ms</InputGroupAddon>
+          </InputGroup>
         </FormGroup>
       </Col>
     </Row>
