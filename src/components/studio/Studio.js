@@ -6,7 +6,7 @@ import { compose, withState, withProps, withHandlers, lifecycle } from 'recompos
 import $ from 'jquery';
 import {
   Row, Col, Button, ButtonGroup, FormGroup, Label, Input,
-  InputGroup, InputGroupAddon, Alert
+  InputGroup, InputGroupAddon
 } from 'reactstrap';
 
 const enhance = compose(
@@ -15,13 +15,13 @@ const enhance = compose(
   withState('textSize1', 'setTextSize1', '1'),
   withState('textSize2', 'setTextSize2', '6'),
   withState('background', 'setBackground', '#ffffff'),
-  withState('barBackground', 'setBarBackground', 'black'),
+  withState('barBackground', 'setBarBackground', '#666666'),
   withState('color', 'setColor', '#222222'),
   withState('imgSrc', 'setImgSrc', 'https://i.scdn.co/image/c253c1f0eaf702620d45c1c7041d1ba161859b33'),
-  withState('timeMs', 'setTimeMs', 3000),
-  withState('recording', 'setRecording', false),
-  withState('previewing', 'setPreviewing', false),
+  withState('timeMs', 'setTimeMs', 5000),
+  withState('playing', 'setPlaying', false),
   withState('storyType', 'setStoryType', 'personal'),
+  withState('centered', 'setCentered', false),
   withProps(props => ({
     innerStyle: {
       background: props.background,
@@ -47,12 +47,26 @@ const enhance = compose(
     handleChange: props => setterName => event => {
       props[setterName](event.target.value);
     },
-    handlePreviewClick: props => event => {
+    handlePlayClick: props => event => {
+      props.setPlaying(true);
+
       const bar = $('#bar');
+      bar.stop();
       bar.width('300px');
       bar.animate({
         width: '0'
-      }, props.timeMs);
+      }, parseInt(props.timeMs, 10), 'swing', () => {
+        props.setPlaying(false);
+        bar.stop();
+      });
+    },
+    handleStopClick: props => event => {
+      const bar = $('#bar');
+      bar.stop();
+      bar.animate({
+        width: '300px'
+      }, 50);
+      props.setPlaying(false);
     }
   }),
   lifecycle({
@@ -96,6 +110,9 @@ const Centered = styled.div`
   justify-content: center;
   align-items: center;
   text-align: left;
+`;
+const Watermark = styled.h6`
+  margin-top: 20px;
 `;
 
 const Studio = props => (
@@ -214,27 +231,18 @@ const Studio = props => (
         </FormGroup>
       </Col>
     </Row>
-    <br/>
-    <Row>
-      <Col xs={4} md={4} lg={4} >
-        <ButtonGroup>
-          <Button outline color="primary" onClick={props.handlePreviewClick}>
-            preview
-          </Button>
-          <Button outline color="success">
-            record
-          </Button>
-        </ButtonGroup>
-      </Col>
-    </Row>
     <hr/>
-    {
-      props.recording
-        ? <Alert>
-            recording
-          </Alert>
-        : null
-    }
+    <div>
+      <Button
+        outline
+        block
+        color={props.playing ? "danger" : "primary"}
+        size="lg"
+        onClick={props.playing ? props.handleStopClick : props.handlePlayClick}
+      >
+        {props.playing ? 'stop' : 'play'}
+      </Button>
+    </div>
     <Book>
       <Page
         title="html"
@@ -248,14 +256,19 @@ const Studio = props => (
             {props.imgSrc.length > 0 ? <img src={props.imgSrc} alt="" /> : null}
           </Centered>
           <Bar id="bar" style={{ background: props.barBackground}} />
+          <Watermark className={props.storyType}>
+            @{props.storyType === 'personal' ? 'jaredplaysguitar' : 'stringsynced'}
+          </Watermark>
         </PageContent>
       </Page>
-      <Page
+      {/* Uncomment to enable html2canvas
+        <Page
         title="canvas"
         innerId="canvas-page-content"
-      >
-        <canvas />
-      </Page>
+        >
+          <canvas />
+        </Page>
+      */}
     </Book>
   </div>
 );

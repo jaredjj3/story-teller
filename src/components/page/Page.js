@@ -33,7 +33,7 @@ const PageOuter = styled.span`
 const PageInner = styled.div`
   margin: 0 auto;
   padding: 2px;
-  border: 1px dashed #eee;
+  border: 3px dashed red;
   width: 360px;
   height: 640px;
   display: flex;
