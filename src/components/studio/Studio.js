@@ -1,9 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Content, Theme, Preview } from '../';
 import html2canvas from 'html2canvas'
-import { compose, withState, withProps, withHandlers, lifecycle } from 'recompose';
 import $ from 'jquery';
+import ImagePalette from 'react-image-palette';
+import { Content, Theme, Preview, Palette } from '../';
+import { compose, withState, withProps, withHandlers, lifecycle } from 'recompose';
 import { Row, Col } from 'reactstrap';
 
 const enhance = compose(
@@ -82,6 +83,12 @@ const Studio = props => (
         <Content {...props} />
         <br/>
         <Theme {...props} />
+        <br/>
+        <ImagePalette
+          crossOrigin
+          image={props.imgSrc}
+          render={Palette}
+        />
       </Col>
       <Col xs={6} md={6} lg={6}>
         <Preview {...props} />
