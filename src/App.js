@@ -26,9 +26,10 @@ const fonts = css`
   }
 `;
 const AppOuter = styled.div`
-  min-width: 700px;
   max-width: 980px;
-  margin: 0 200px 200px 200px;
+  margin: 0 auto;
+  margin-bottom: 200px;
+  overflow-x: hidden;
 
   ${fonts}
 `;

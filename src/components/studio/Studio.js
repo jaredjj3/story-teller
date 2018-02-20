@@ -6,7 +6,7 @@ import { compose, withState, withProps, withHandlers, lifecycle } from 'recompos
 import $ from 'jquery';
 import {
   Row, Col, Button, ButtonGroup, FormGroup, Label, Input,
-  InputGroup, InputGroupAddon
+  InputGroup, InputGroupAddon, FormText
 } from 'reactstrap';
 
 const enhance = compose(
@@ -21,7 +21,7 @@ const enhance = compose(
   withState('timeMs', 'setTimeMs', 5000),
   withState('playing', 'setPlaying', false),
   withState('storyType', 'setStoryType', 'personal'),
-  withState('centered', 'setCentered', false),
+  withState('textAlign', 'setTextAlign', 'left'),
   withProps(props => ({
     innerStyle: {
       background: props.background,
@@ -219,6 +219,9 @@ const Studio = props => (
             value={props.imgSrc}
             onChange={props.handleChange('setImgSrc')}
           />
+          <FormText>
+            https://www.stringsync.com/assets/logo/logo-04c8b7f1c8115db296e7163f467b89033f78cb423869f84710e49d2aa5f93147.png
+          </FormText>
         </FormGroup>
         <FormGroup>
           <Label for="bar-background">bar background</Label>
@@ -228,6 +231,19 @@ const Studio = props => (
             value={props.barBackground}
             onChange={props.handleChange('setBarBackground')}
           />
+        </FormGroup>
+        <FormGroup>
+          <Label for="text-align">align</Label>
+          <Input
+            id="text-align"
+            type="select"
+            value={props.textAlign}
+            onChange={props.handleChange('setTextAlign')}
+          >
+            <option value="left">left</option>
+            <option value="center">center</option>
+            <option value="right">right</option>
+          </Input>
         </FormGroup>
       </Col>
     </Row>
@@ -249,7 +265,7 @@ const Studio = props => (
         innerId="html-page-content"
         innerStyle={props.innerStyle}
       >
-        <PageContent>
+        <PageContent style={{ textAlign: props.textAlign }}>
           <props.mainTag className={props.storyType}>{props.text1}</props.mainTag>
           <props.subTag className={props.storyType}>{props.text2}</props.subTag>
           <Centered>
