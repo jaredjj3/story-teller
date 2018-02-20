@@ -84,9 +84,22 @@ const Book = styled.div`
   justify-content: space-around;
   margin-top: 50px;
 `;
+const BarContainer = styled.div`
+  height: 20px;
+`;
 const Bar = styled.div`
   height: 10px;
-  margin: 0 auto;
+  ${props => {
+    let style;
+
+    if (props.textAlign === 'center') {
+      style = 'margin: 0 auto;';
+    } else {
+      style = `float: ${props.textAlign};`
+    }
+
+    return style;
+  }}
   margin-top: 10px;
   width: 300px;
 `;
@@ -114,7 +127,7 @@ const Centered = styled.div`
 const Watermark = styled.h6`
   margin-top: 20px;
 `;
-const PlayButton = styled.div`
+const ButtonContainer = styled.div`
   margin: 0 auto;
   margin-top: 20px;
   width: 360px;
@@ -262,7 +275,13 @@ const Studio = props => (
               <Centered>
                 {props.imgSrc.length > 0 ? <img src={props.imgSrc} alt="" /> : null}
               </Centered>
-              <Bar id="bar" style={{ background: props.barBackground}} />
+              <BarContainer>
+                <Bar 
+                  id="bar"
+                  style={{ background: props.barBackground}}
+                  textAlign={props.textAlign}
+                />
+              </BarContainer>
               <Watermark className={props.storyType}>
                 @{props.storyType === 'personal' ? 'jaredplaysguitar' : 'stringsynced'}
               </Watermark>
@@ -277,7 +296,7 @@ const Studio = props => (
             </Page>
           */}
         </Book>
-          <PlayButton>
+          <ButtonContainer>
             <Button
               outline
               block
@@ -287,7 +306,7 @@ const Studio = props => (
             >
               {props.playing ? 'stop' : 'play'}
           </Button>
-        </PlayButton>
+        </ButtonContainer>
       </Col>
     </Row>
     <hr/>

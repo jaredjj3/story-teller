@@ -5,6 +5,7 @@
   "dependencies": {
     "bootstrap": "^4.0.0",
     "html2canvas": "^1.0.0-alpha.10",
+    "image-palette": "^1.0.3",
     "jquery": "^3.3.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
