@@ -24,6 +24,7 @@ const enhance = compose(
   withState('playing', 'setPlaying', false),
   withState('storyType', 'setStoryType', 'personal'),
   withState('textAlign', 'setTextAlign', 'left'),
+  withState('palette', 'setPalette', DEFAULT_PALETTE),
   withProps(props => ({
     innerStyle: {
       background: props.background,
@@ -34,15 +35,18 @@ const enhance = compose(
   })),
   withProps(props => ({
     updateCanvas: () => {
-      const html = $('#html-page-content')[0];
-      let dest = $('#canvas-page-content canvas')[0];
+      // noop
+      //
+      //
+      // const html = $('#html-page-content')[0];
+      // let dest = $('#canvas-page-content canvas')[0];
 
-      if (html && dest) {
-        html2canvas(html, { useCORS: true, logging: false }).then(canvas => {
-          dest.replaceWith(canvas);
-          dest = canvas;
-        });
-      }
+      // if (html && dest) {
+      //   html2canvas(html, { useCORS: true, logging: false }).then(canvas => {
+      //     dest.replaceWith(canvas);
+      //     dest = canvas;
+      //   });
+      // }
     }
   })),
   withHandlers({
@@ -69,6 +73,11 @@ const enhance = compose(
         width: '0'
       }, 50);
       props.setPlaying(false);
+    },
+    handlePaletteClick: props => event => {
+      const { backgroundColor, color } = props.palette;
+      props.setBackground(backgroundColor);
+      props.setColor(color);
     }
   }),
   lifecycle({
@@ -92,7 +101,7 @@ const Studio = props => (
         <ImagePalette
           crossOrigin
           image={props.imgSrc}
-          render={Palette}
+          render={paletteProps => <Palette {...props} {...paletteProps} />}
           default={{ DEFAULT_PALETTE }}
         />
       </Col>

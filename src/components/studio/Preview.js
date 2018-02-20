@@ -83,13 +83,13 @@ const Preview = props => (
         </PageContent>
       </Page>
       {/* Uncomment to enable html2canvas
-            <Page
-            title="canvas"
-            innerId="canvas-page-content"
-            >
-              <canvas />
-            </Page>
-          */}
+        <Page
+        title="canvas"
+        innerId="canvas-page-content"
+        >
+          <canvas />
+        </Page>
+      */}
     </Book>
     <ButtonContainer>
       <Button
