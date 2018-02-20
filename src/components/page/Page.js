@@ -9,15 +9,18 @@ const enhance = compose(
     const title = restProps.title;
     const children = restProps.children;
     const innerId = restProps.innerId;
+    const innerStyle = restProps.innerStyle;
 
     delete restProps.title;
     delete restProps.children;
     delete restProps.innerId;
+    delete restProps.innerStyle;
 
     return {
       title,
       children,
       innerId,
+      innerStyle,
       restProps
     };
   })
@@ -39,10 +42,10 @@ const PageInner = styled.div`
   justify-content: center;
 `;
 
-const Page = ({ children, title, innerId, restProps }) => (
+const Page = ({ children, title, innerId, innerStyle, restProps }) => (
   <PageOuter {...restProps}>
     <h3>{title}</h3>
-    <PageInner id={innerId}>
+    <PageInner id={innerId} style={innerStyle}>
       {children}
     </PageInner>
   </PageOuter>
