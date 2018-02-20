@@ -13,7 +13,7 @@ const enhance = compose(
   withState('text1', 'setText1', 'The Less I Know the Better'),
   withState('text2', 'setText2', 'Tame Impala'),
   withState('textSize1', 'setTextSize1', '1'),
-  withState('textSize2', 'setTextSize2', '6'),
+  withState('textSize2', 'setTextSize2', '5'),
   withState('background', 'setBackground', '#ffffff'),
   withState('barBackground', 'setBarBackground', '#666666'),
   withState('color', 'setColor', '#222222'),
@@ -114,11 +114,16 @@ const Centered = styled.div`
 const Watermark = styled.h6`
   margin-top: 20px;
 `;
+const PlayButton = styled.div`
+  margin: 0 auto;
+  margin-top: 20px;
+  width: 360px;
+`;
 
 const Studio = props => (
   <div>
     <Row>
-      <Col xs={4} md={4} lg={4}>
+      <Col xs={6} md={6} lg={6}>
         <FormGroup>
           <Label for="text1">text1</Label>
           <Input
@@ -185,9 +190,7 @@ const Studio = props => (
             onChange={props.handleChange('setColor')}
           />
         </FormGroup>
-      </Col>
-      <Col xs={4} md={4} lg={4}>
-      <FormGroup>
+        <FormGroup>
         <Label for="story-type">story type</Label>
           <Input
             id="story-type"
@@ -246,46 +249,48 @@ const Studio = props => (
           </Input>
         </FormGroup>
       </Col>
+      <Col xs={6} md={6} lg={6}>
+        <Book>
+          <Page
+            title="html"
+            innerId="html-page-content"
+            innerStyle={props.innerStyle}
+          >
+            <PageContent style={{ textAlign: props.textAlign }}>
+              <props.mainTag className={props.storyType}>{props.text1}</props.mainTag>
+              <props.subTag className={props.storyType}>{props.text2}</props.subTag>
+              <Centered>
+                {props.imgSrc.length > 0 ? <img src={props.imgSrc} alt="" /> : null}
+              </Centered>
+              <Bar id="bar" style={{ background: props.barBackground}} />
+              <Watermark className={props.storyType}>
+                @{props.storyType === 'personal' ? 'jaredplaysguitar' : 'stringsynced'}
+              </Watermark>
+            </PageContent>
+          </Page>
+          {/* Uncomment to enable html2canvas
+            <Page
+            title="canvas"
+            innerId="canvas-page-content"
+            >
+              <canvas />
+            </Page>
+          */}
+        </Book>
+          <PlayButton>
+            <Button
+              outline
+              block
+              color={props.playing ? "danger" : "primary"}
+              size="lg"
+              onClick={props.playing ? props.handleStopClick : props.handlePlayClick}
+            >
+              {props.playing ? 'stop' : 'play'}
+          </Button>
+        </PlayButton>
+      </Col>
     </Row>
     <hr/>
-    <div>
-      <Button
-        outline
-        block
-        color={props.playing ? "danger" : "primary"}
-        size="lg"
-        onClick={props.playing ? props.handleStopClick : props.handlePlayClick}
-      >
-        {props.playing ? 'stop' : 'play'}
-      </Button>
-    </div>
-    <Book>
-      <Page
-        title="html"
-        innerId="html-page-content"
-        innerStyle={props.innerStyle}
-      >
-        <PageContent style={{ textAlign: props.textAlign }}>
-          <props.mainTag className={props.storyType}>{props.text1}</props.mainTag>
-          <props.subTag className={props.storyType}>{props.text2}</props.subTag>
-          <Centered>
-            {props.imgSrc.length > 0 ? <img src={props.imgSrc} alt="" /> : null}
-          </Centered>
-          <Bar id="bar" style={{ background: props.barBackground}} />
-          <Watermark className={props.storyType}>
-            @{props.storyType === 'personal' ? 'jaredplaysguitar' : 'stringsynced'}
-          </Watermark>
-        </PageContent>
-      </Page>
-      {/* Uncomment to enable html2canvas
-        <Page
-        title="canvas"
-        innerId="canvas-page-content"
-        >
-          <canvas />
-        </Page>
-      */}
-    </Book>
   </div>
 );
 
