@@ -3,9 +3,7 @@ import styled from 'styled-components';
 import { Page } from '../';
 import html2canvas from 'html2canvas'
 import { compose, withState, lifecycle } from 'recompose';
-import { 
-  Button, ControlLabel, FormGroup, FormControl, Row, Col, ButtonToolbar, InputGroup
-} from 'react-bootstrap';
+import { Row, Col } from 'reactstrap';
 import $ from 'jquery';
 
 let rafId;
@@ -16,24 +14,24 @@ const enhance = compose(
       const html = $('#html-page-content')[0];
       let dest = $('#canvas-page-content canvas')[0];
 
-      $('#bar').animate({
-        width: '80%'
-      }, 200, 'swing', () => {
-        $('#bar').animate({
-          width: '0%'
-        }, 5000);
-      });
+      // $('#bar').animate({
+      //   width: '80%'
+      // }, 200, 'swing', () => {
+      //   $('#bar').animate({
+      //     width: '0%'
+      //   }, 5000);
+      // });
 
-      const drawFrame = () => {
-        html2canvas(html, { useCORS: true }).then(canvas => {
-          dest.replaceWith(canvas);
-          dest = canvas;
-        });
+      // const drawFrame = () => {
+      //   html2canvas(html, { useCORS: true }).then(canvas => {
+      //     dest.replaceWith(canvas);
+      //     dest = canvas;
+      //   });
       
-        rafId = window.requestAnimationFrame(drawFrame);
-      }
+      //   rafId = window.requestAnimationFrame(drawFrame);
+      // }
 
-      window.requestAnimationFrame(drawFrame);
+      // window.requestAnimationFrame(drawFrame);
     },
     componentWillUnmount() {
       window.cancelAnimationFrame(rafId);
@@ -62,27 +60,9 @@ const Studio = ({ width }) => (
     <StudioInner>
       <Row>
         <Col xs={8} md={6} lg={4}>
-          <FormGroup>
-            <ControlLabel>text</ControlLabel>
-            <FormControl componentClass="textarea" type="text" />
-          </FormGroup>
-          <FormGroup>
-            <ControlLabel>time</ControlLabel>
-            <InputGroup>
-              <FormControl type="number" />
-              <InputGroup.Addon>ms</InputGroup.Addon>
-            </InputGroup>
-          </FormGroup>
+          <p>Row 1</p>
         </Col>
       </Row>
-      <ButtonToolbar>
-        <Button bsStyle="success">
-          Play
-        </Button>
-        <Button bsStyle="primary">
-          Record
-        </Button>
-      </ButtonToolbar>
       <Book>
         <Page
           title="html"
