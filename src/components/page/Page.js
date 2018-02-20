@@ -44,7 +44,7 @@ const PageInner = styled.div`
 
 const Page = ({ children, title, innerId, innerStyle, restProps }) => (
   <PageOuter {...restProps}>
-    <h3>{title}</h3>
+    <b>{title}</b>
     <PageInner id={innerId} style={innerStyle}>
       {children}
     </PageInner>

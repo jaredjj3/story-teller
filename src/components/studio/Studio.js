@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Page } from '../';
+import { Page, Content, Theme } from '../';
 import html2canvas from 'html2canvas'
 import { compose, withState, withProps, withHandlers, lifecycle } from 'recompose';
 import $ from 'jquery';
 import {
-  Row, Col, Button, ButtonGroup, FormGroup, Label, Input,
-  InputGroup, InputGroupAddon, FormText
+  Row, Col, Button, FormGroup, Label, Input,
+  InputGroup, InputGroupAddon
 } from 'reactstrap';
 
 const enhance = compose(
@@ -15,9 +15,8 @@ const enhance = compose(
   withState('textSize1', 'setTextSize1', '1'),
   withState('textSize2', 'setTextSize2', '5'),
   withState('background', 'setBackground', '#ffffff'),
-  withState('barBackground', 'setBarBackground', '#666666'),
   withState('color', 'setColor', '#222222'),
-  withState('imgSrc', 'setImgSrc', 'https://i.scdn.co/image/c253c1f0eaf702620d45c1c7041d1ba161859b33'),
+  withState('imgSrc', 'setImgSrc', ''), // 'https://i.scdn.co/image/c253c1f0eaf702620d45c1c7041d1ba161859b33'),
   withState('timeMs', 'setTimeMs', 5000),
   withState('playing', 'setPlaying', false),
   withState('storyType', 'setStoryType', 'personal'),
@@ -55,7 +54,7 @@ const enhance = compose(
       bar.width('300px');
       bar.animate({
         width: '0'
-      }, parseInt(props.timeMs, 10), 'swing', () => {
+      }, parseInt(props.timeMs, 10), 'linear', () => {
         props.setPlaying(false);
         bar.stop();
       });
@@ -64,10 +63,10 @@ const enhance = compose(
       const bar = $('#bar');
       bar.stop();
       bar.animate({
-        width: '300px'
+        width: '0'
       }, 50);
       props.setPlaying(false);
-    }
+    },
   }),
   lifecycle({
     componentDidMount() {
@@ -82,7 +81,6 @@ const enhance = compose(
 const Book = styled.div`
   display: flex;
   justify-content: space-around;
-  margin-top: 50px;
 `;
 const BarContainer = styled.div`
   height: 20px;
@@ -137,130 +135,9 @@ const Studio = props => (
   <div>
     <Row>
       <Col xs={6} md={6} lg={6}>
-        <FormGroup>
-          <Label for="text1">text1</Label>
-          <Input
-            id="text1"
-            type="text1"
-            value={props.text1}
-            onChange={props.handleChange('setText1')}
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label for="text-size1">size1</Label>
-          <Input
-            id="text-size1"
-            type="select"
-            value={props.textSize1}
-            onChange={props.handleChange('setTextSize1')}
-          >
-            <option value="1">xl</option>
-            <option value="2">lg</option>
-            <option value="3">md</option>
-            <option value="4">sm</option>
-            <option value="5">xs</option>
-          </Input>
-        </FormGroup>
-        <FormGroup>
-          <Label for="text2">text2</Label>
-          <Input
-            id="text2"
-            type="text2"
-            value={props.text2}
-            onChange={props.handleChange('setText2')}
-          />
-        </FormGroup>
-        <FormGroup>
-        <Label for="text-size2">size2</Label>
-          <Input
-            id="text-size2"
-            type="select"
-            value={props.textSize2}
-            onChange={props.handleChange('setTextSize2')}
-          >
-            <option value="1">xl</option>
-            <option value="2">lg</option>
-            <option value="3">md</option>
-            <option value="4">sm</option>
-            <option value="5">xs</option>
-          </Input>
-        </FormGroup>
-        <FormGroup>
-          <Label for="background">background</Label>
-          <Input
-            id="background"
-            type="text"
-            value={props.background}
-            onChange={props.handleChange('setBackground')}
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label for="color">color</Label>
-          <Input
-            id="color"
-            type="text"
-            value={props.color}
-            onChange={props.handleChange('setColor')}
-          />
-        </FormGroup>
-        <FormGroup>
-        <Label for="story-type">story type</Label>
-          <Input
-            id="story-type"
-            type="select"
-            value={props.storyType}
-            onChange={props.handleChange('setStoryType')}
-          > 
-            <option value="personal">personal</option>
-            <option value="string-sync">stringsync</option>
-          </Input>
-        </FormGroup>
-        <FormGroup>
-          <Label for="time">time</Label>
-          <InputGroup>
-            <Input
-              id="time"
-              type="number"
-              value={props.timeMs}
-              onChange={props.handleChange('setTimeMs')}
-            />
-            <InputGroupAddon addonType="append">ms</InputGroupAddon>
-          </InputGroup>
-        </FormGroup>
-        <FormGroup>
-          <Label for="img">img</Label>
-          <Input
-            id="img"
-            type="text"
-            value={props.imgSrc}
-            onChange={props.handleChange('setImgSrc')}
-          />
-          <FormText>
-            https://www.stringsync.com/assets/logo/logo-04c8b7f1c8115db296e7163f467b89033f78cb423869f84710e49d2aa5f93147.png
-          </FormText>
-        </FormGroup>
-        <FormGroup>
-          <Label for="bar-background">bar background</Label>
-          <Input
-            id="bar-background"
-            type="text"
-            value={props.barBackground}
-            onChange={props.handleChange('setBarBackground')}
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label for="text-align">align</Label>
-          <Input
-            id="text-align"
-            type="select"
-            value={props.textAlign}
-            onChange={props.handleChange('setTextAlign')}
-          >
-            <option value="left">left</option>
-            <option value="center">center</option>
-            <option value="right">right</option>
-          </Input>
-        </FormGroup>
+        <Content {...props} />
+        <br/>
+        <Theme {...props} />
       </Col>
       <Col xs={6} md={6} lg={6}>
         <Book>
@@ -278,7 +155,7 @@ const Studio = props => (
               <BarContainer>
                 <Bar 
                   id="bar"
-                  style={{ background: props.barBackground}}
+                  style={{ background: props.color}}
                   textAlign={props.textAlign}
                 />
               </BarContainer>
