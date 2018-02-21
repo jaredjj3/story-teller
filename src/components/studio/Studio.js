@@ -3,7 +3,7 @@ import { compose, withState, withProps, withHandlers, lifecycle } from 'recompos
 import html2canvas from 'html2canvas'
 import $ from 'jquery';
 import ImagePalette from 'react-image-palette';
-import { Content, Theme, Preview, Palette } from '../';
+import { Content, Theme, Preview, Palette, Player } from '../';
 import { Row, Col } from 'reactstrap';
 
 const DEFAULT_PALETTE = Object.freeze({
@@ -35,18 +35,15 @@ const enhance = compose(
   })),
   withProps(props => ({
     updateCanvas: () => {
-      // noop
-      //
-      //
-      // const html = $('#html-page-content')[0];
-      // let dest = $('#canvas-page-content canvas')[0];
+      const html = $('#html-page-content')[0];
+      let dest = $('#canvas-page-content canvas')[0];
 
-      // if (html && dest) {
-      //   html2canvas(html, { useCORS: true, logging: false }).then(canvas => {
-      //     dest.replaceWith(canvas);
-      //     dest = canvas;
-      //   });
-      // }
+      if (html && dest) {
+        html2canvas(html, { useCORS: true, logging: false }).then(canvas => {
+          dest.replaceWith(canvas);
+          dest = canvas;
+        });
+      }
     }
   })),
   withHandlers({
@@ -110,6 +107,7 @@ const Studio = props => (
       </Col>
     </Row>
     <hr/>
+    <Player />
   </div>
 );
 

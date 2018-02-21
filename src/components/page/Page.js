@@ -26,25 +26,17 @@ const enhance = compose(
   })
 );
 
-const PageOuter = styled.span`
+const PageOuter = styled.div`
   overflow: hidden;
-  box-sizing: border-box;
+  width: 360px;
 `;
 const PageInner = styled.div`
   margin: 0 auto;
-  padding: 2px;
-  border: 3px dashed red;
-  width: 360px;
   height: 640px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 `;
 
 const Page = ({ children, title, innerId, innerStyle, restProps }) => (
   <PageOuter {...restProps}>
-    <b>{title}</b>
     <PageInner id={innerId} style={innerStyle}>
       {children}
     </PageInner>
