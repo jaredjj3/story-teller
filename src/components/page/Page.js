@@ -28,7 +28,7 @@ const enhance = compose(
 
 const PageOuter = styled.div`
   overflow: hidden;
-  width: 360px;
+  box-sizing: border-box;
   border: 3px dashed red;
 `;
 const PageInner = styled.div`
