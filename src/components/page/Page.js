@@ -29,6 +29,7 @@ const enhance = compose(
 const PageOuter = styled.div`
   overflow: hidden;
   width: 360px;
+  border: 3px dashed red;
 `;
 const PageInner = styled.div`
   margin: 0 auto;

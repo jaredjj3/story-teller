@@ -29,6 +29,15 @@ const Theme = props => (
             onChange={props.handleChange('setColor')}
           />
         </FormGroup>
+        <FormGroup>
+          <Label for="alt-color">alt color</Label>
+          <Input
+            id="alt-color"
+            type="text"
+            value={props.altColor}
+            onChange={props.handleChange('setAltColor')}
+          />
+        </FormGroup>
       </Col>
       <Col xs={6} md={6} lg={6}>
         <FormGroup>

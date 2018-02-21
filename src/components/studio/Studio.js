@@ -25,6 +25,8 @@ const enhance = compose(
   withState('storyType', 'setStoryType', 'personal'),
   withState('textAlign', 'setTextAlign', 'left'),
   withState('palette', 'setPalette', DEFAULT_PALETTE),
+  withState('mountPalette', 'setMountPalette', true),
+  withState('altColor', 'setAltColor', '#222222'),
   withProps(props => ({
     innerStyle: {
       background: props.background,
@@ -72,17 +74,27 @@ const enhance = compose(
       props.setPlaying(false);
     },
     handlePaletteClick: props => event => {
-      const { backgroundColor, color } = props.palette;
+      const { backgroundColor, color, alternativeColor } = props.palette;
       props.setBackground(backgroundColor);
       props.setColor(color);
+      props.setAltColor(alternativeColor);
     }
   }),
   lifecycle({
     componentDidMount() {
       this.props.updateCanvas();
     },
+    componentWillReceiveProps(nextProps) {
+      if (this.props.imgSrc !== nextProps.imgSrc) {
+        nextProps.setMountPalette(false);
+      }
+    },
     componentDidUpdate() {
       this.props.updateCanvas();
+      
+      if (!this.props.mountPalette) {
+        this.props.setMountPalette(true);
+      }
     }
   })
 );
@@ -95,19 +107,22 @@ const Studio = props => (
         <br/>
         <Theme {...props} />
         <br/>
-        <ImagePalette
-          crossOrigin
-          image={props.imgSrc}
-          render={paletteProps => <Palette {...props} {...paletteProps} />}
-          default={{ DEFAULT_PALETTE }}
-        />
+        {
+          props.mountPalette
+            ? <ImagePalette
+                crossOrigin
+                image={props.imgSrc}
+                render={paletteProps => <Palette {...props} {...paletteProps} />}
+                default={{ DEFAULT_PALETTE }}
+              />
+            : null 
+        }
       </Col>
       <Col xs={6} md={6} lg={6}>
         <Preview {...props} />
       </Col>
     </Row>
     <hr/>
-    <Player />
   </div>
 );
 

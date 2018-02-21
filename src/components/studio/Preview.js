@@ -17,26 +17,35 @@ const Book = styled.div`
   justify-content: space-around;
 `;
 const BarContainer = styled.div`
+  margin-top: 10px;
   height: 20px;
+  width: 300px;
 `;
 const Bar = styled.div`
   height: 10px;
-  margin: 0 auto;
-  margin-top: 10px;
-  width: 300px;
+
+  ${props => {
+    let style;
+    if (props.textAlign === 'center') {
+      style = 'margin: 0 auto;';
+    } else {
+      style = `float: ${props.textAlign};`
+    }
+    return style;
+  }}
 `;
 const Centered = styled.div`
   margin: 0 auto;
 `;
 const PageContentOuter = styled.div`
-  padding: 20px;
   width: 360px;
 `;
 const PageContentInner = styled.div`
   display: flex;
-  padding-top: 40px;
   flex-direction: column;
   justify-content: center;
+  align-content: center;
+  height: 640px;
 
   img {
     width: 300px;
@@ -70,11 +79,13 @@ const Preview = props => (
               {props.imgSrc.length > 0 ? <img src={props.imgSrc} alt="" /> : null}
             </Centered>
             <Centered>
-              <Bar
-                id="bar"
-                style={{ background: props.color }}
-                textAlign={props.textAlign}
-              />
+              <BarContainer>
+                <Bar
+                  id="bar"
+                  style={{ background: props.altColor }}
+                  textAlign={props.textAlign}
+                />
+              </BarContainer>
             </Centered>
             <Centered>
               <Watermark className={props.storyType}>
