@@ -1,11 +1,13 @@
 import { Divider, Layout } from 'antd';
 import * as React from 'react';
 import styled from 'react-emotion';
+import { THEME } from 'constants/index';
 
 const Centered = styled('div')`
   display: flex;
   align-items: center;
   justify-content: center;
+  max-width: ${() => THEME.maxWidth};
 `;
 
 export const Footer = () => (
