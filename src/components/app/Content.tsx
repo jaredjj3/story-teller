@@ -15,7 +15,7 @@ interface IWithHandlerProps extends IWithStateProps {
 }
 
 const enhance = compose<IWithHandlerProps, {}>(
-  withState('imgSrc', 'setImgSrc', ''),
+  withState('imgSrc', 'setImgSrc', 'https://i.scdn.co/image/66e9cdf5889a43b97f9e6b5b0641b74b5a201759'),
   withHandlers({
     handleImgSrcChange: (props: IWithStateProps) => (event: any) => {
       props.setImgSrc(event.target.value);
@@ -24,7 +24,7 @@ const enhance = compose<IWithHandlerProps, {}>(
 );
 
 export const ContentContext = React.createContext({
-  imgSrc: '',
+  imgSrc: 'https://i.scdn.co/image/66e9cdf5889a43b97f9e6b5b0641b74b5a201759',
   handleImgSrcChange: (event: React.ChangeEvent) => { return; },
   setImgSrc: (imgSrc: string) => { return; }
 });
