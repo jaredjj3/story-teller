@@ -7,6 +7,7 @@ const Centered = styled('div')`
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0 auto;
   max-width: ${() => THEME.maxWidth};
 `;
 
