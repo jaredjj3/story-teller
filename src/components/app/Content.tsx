@@ -1,11 +1,12 @@
 import { Layout, Row, Col } from 'antd';
 import * as React from 'react';
 import styled from 'react-emotion';
-import { Editor } from '../editor';
-import { Preview } from '../preview';
+import { Editor, Preview } from 'components';
 
 const Style = styled('div')`
   min-height: 100vh;
+  margin: 0 auto;
+  max-width: 1080px;
 `;
 
 export const Content = () => (
