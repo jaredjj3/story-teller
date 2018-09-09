@@ -7,26 +7,53 @@ import { compose, withState, withHandlers } from 'recompose';
 
 interface IWithStateProps {
   imgSrc: string;
+  color: string;
+  backgroundColor: string;
+  alternativeColor: string;
   setImgSrc: (imgSrc: string) => void;
+  setColor: (color: string) => void;
+  setBackgroundColor: (backgroundColor: string) => void;
+  setAlternativeColor: (alternativeColor: string) => void;
+}
+
+interface IPalette {
+  color: string;
+  backgroundColor: string;
+  alternativeColor: string;
 }
 
 interface IWithHandlerProps extends IWithStateProps {
-  handleImgSrcChange: (event: React.ChangeEvent) => void;
+  handleImgSrcChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handlePaletteChange: (palette: IPalette) => void;
 }
 
 const enhance = compose<IWithHandlerProps, {}>(
-  withState('imgSrc', 'setImgSrc', ''),
+  withState('imgSrc', 'setImgSrc', 'https://i.scdn.co/image/66e9cdf5889a43b97f9e6b5b0641b74b5a201759'),
+  withState('color', 'setColor', 'black'),
+  withState('backgroundColor', 'setBackgroundColor', 'white'),
+  withState('alternativeColor', 'setAlternativeColor', 'darkgray'),
   withHandlers({
-    handleImgSrcChange: (props: IWithStateProps) => (event: any) => {
+    handleImgSrcChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
       props.setImgSrc(event.target.value);
+    },
+    handlePaletteChange: (props: IWithStateProps) => (palette: IPalette) => {
+      props.setColor(palette.color);
+      props.setBackgroundColor(palette.backgroundColor);
+      props.setAlternativeColor(palette.alternativeColor);
     }
   })
 );
 
 export const ContentContext = React.createContext({
-  imgSrc: '',
-  handleImgSrcChange: (event: React.ChangeEvent) => { return; },
-  setImgSrc: (imgSrc: string) => { return; }
+  imgSrc: 'https://i.scdn.co/image/66e9cdf5889a43b97f9e6b5b0641b74b5a201759',
+  color: 'black',
+  backgroundColor: 'white',
+  alternativeColor: 'darkgray',
+  handleImgSrcChange: (event: React.ChangeEvent<HTMLInputElement>) => { return; },
+  setImgSrc: (imgSrc: string) => { return; },
+  setBackgroundColor: (backgroundColor: string) => { return; },
+  setAlternativeColor: (alternativeColor: string) => { return; },
+  handlePaletteChange: (palette: IPalette) => { return; }
 });
 
 const Style = styled('div')`
