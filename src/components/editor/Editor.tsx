@@ -1,5 +1,7 @@
 import * as React from 'react';
 
 export const Editor = () => (
-  <div>Editor</div>
+  <div>
+    <h2>editor</h2>
+  </div>
 );

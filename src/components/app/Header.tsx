@@ -4,18 +4,18 @@ import styled from 'react-emotion';
 import { THEME } from 'constants/index';
 
 const Style = styled('div')`
-  color: white;
-  font-weight: lighter;
-  font-size: 24px;
-  letter-spacing: 2px;
   margin: 0 auto;
   max-width: ${() => THEME.maxWidth};
+`;
+
+const StyledH1 = styled('h1')`
+  color: white;
 `;
 
 export const Header = () => (
   <Layout.Header>
     <Style>
-      story teller ✨
+      <StyledH1>story teller ✨</StyledH1>
     </Style>
   </Layout.Header>
 );

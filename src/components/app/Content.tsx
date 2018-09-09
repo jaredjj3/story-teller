@@ -8,6 +8,7 @@ const Style = styled('div')`
   min-height: 100vh;
   margin: 0 auto;
   max-width: ${() => THEME.maxWidth};
+  margin-top: 24px;
 `;
 
 export const Content = () => (
