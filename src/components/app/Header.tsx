@@ -4,13 +4,15 @@ import styled from 'react-emotion';
 
 const Style = styled('div')`
   color: white;
-  font-weight: 100;
+  font-weight: lighter;
+  font-size: 24px;
+  letter-spacing: 2px;
 `;
 
 export const Header = () => (
   <Layout.Header>
     <Style>
-      story teller
+      story teller ✨
     </Style>
   </Layout.Header>
 );
