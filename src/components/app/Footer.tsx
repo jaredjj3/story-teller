@@ -2,7 +2,7 @@ import { Divider, Layout } from 'antd';
 import * as React from 'react';
 import styled from 'react-emotion';
 
-const ContentCentered = styled('div')`
+const Centered = styled('div')`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10,7 +10,7 @@ const ContentCentered = styled('div')`
 
 export const Footer = () => (
   <Layout.Footer>
-    <ContentCentered>
+    <Centered>
       <a href="https://instagram.com/jaredplaysguitar">
         @jaredplaysguitar
       </a>
@@ -18,6 +18,10 @@ export const Footer = () => (
       <a href="https://jaredcodes.com">
         jaredcodes.com
       </a>
-    </ContentCentered>
+      <Divider type="vertical" />
+      <a href="https://stringsync.com">
+        stringsync.com
+      </a>
+    </Centered>
   </Layout.Footer>
 );
