@@ -1,16 +1,25 @@
 import * as React from 'react';
-import { Row, Col } from 'antd';
+import { Row, Col, Form, Input } from 'antd';
 import styled from 'react-emotion';
 import { Preview } from '../preview';
-import { compose, withState } from 'recompose';
+import { compose, withState, withHandlers } from 'recompose';
 
 interface IWithStateProps {
   src: string;
   setSrc: (src: string) => void;
 }
 
-const enhance = compose<IWithStateProps, {}>(
-  withState('src', 'setSrc', 'https://i.scdn.co/÷÷÷/66e9cdf5889a43b97f9e6b5b0641b74b5a201759')
+interface IWithHandlerProps extends IWithStateProps {
+  handleSrcChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const enhance = compose<IWithHandlerProps, {}>(
+  withState('src', 'setSrc', 'https://i.scdn.co/image/c86f5f7a542e81c14ec6a65f009a2ab801e32272'),
+  withHandlers({
+    handleSrcChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      props.setSrc(event.currentTarget.value);
+    }
+  })
 );
 
 const Style = styled('div')`
@@ -21,7 +30,11 @@ export const Editor = enhance(props => (
   <Style>
     <Row>
       <Col span={6}>
-        Editor
+        <Form>
+          <Form.Item label="src">
+            <Input value={props.src} onChange={props.handleSrcChange} />
+          </Form.Item>
+        </Form>
       </Col>
       <Col span={18}>
         <Preview src={props.src} />
