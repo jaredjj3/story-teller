@@ -1,9 +1,12 @@
 import * as React from 'react';
-import styled from 'react-emotion';
 import { compose, branch, renderNothing, withState, lifecycle, withHandlers } from 'recompose';
+import { IPalette } from 'types/palette';
+import ImagePalette from 'react-image-palette';
+import { SyncPalette } from './SyncPalette';
 
 interface IOuterProps {
   src: string;
+  onPaletteChange: (palette: IPalette) => void;
 }
 
 interface IWithStateProps extends IOuterProps {
@@ -36,12 +39,15 @@ const enhance = compose<IWithHandlerProps, IOuterProps>(
   branch<IWithStateProps>(props => !props.isSrcValid, renderNothing)
 );
 
-const Style = styled('div')`
-  padding-left: 12px;
-`;
-
 export const Preview = enhance(props => (
-  <Style>
+  <div>
     <img src={props.src} />
-  </Style>
+    <ImagePalette crossOrigin={true} image={props.src}>
+      {
+        (palette: IPalette) => (
+          <SyncPalette onPaletteChange={props.onPaletteChange} palette={palette} />
+        )
+      }
+    </ImagePalette>
+  </div>
 ));
