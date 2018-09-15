@@ -7,12 +7,8 @@ import { IPalette } from 'types/palette';
 import { DEFAULT_PALETTE } from 'constants/DEFAULT_PALETTE';
 import { Audio } from '../audio';
 import { UploadChangeParam } from 'antd/lib/upload';
-
-interface ITextReelSpec {
-  text: string;
-  from: number;
-  to: number;
-}
+import { ITextSpec } from 'types/text-spec';
+import { last, get } from 'lodash';
 
 interface IWithStateProps {
   imgSrc: string;
@@ -20,11 +16,13 @@ interface IWithStateProps {
   palette: IPalette;
   timeMs: number;
   playing: boolean;
+  textSpecs: ITextSpec[];
   setPalette: (palette: IPalette) => void;
   setImgSrc: (src: string) => void;
   setTimeMs: (timeMs: number) => void;
   setMusicSrc: (musicSrc: string) => void;
   setPlaying: (playing: boolean) => void;
+  setTextSpecs: (textSpecs: ITextSpec[]) => void;
 }
 
 interface IWithHandlerProps extends IWithStateProps {
@@ -38,6 +36,11 @@ interface IWithHandlerProps extends IWithStateProps {
   handleMusicSrcChange: (info: UploadChangeParam) => void
   handlePlay: () => void;
   handlePause: () => void;
+  addTextSpec: () => void;
+  removeTextSpec: () => void;
+  handleTextSpecTextChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleTextSpecFromChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleTextSpecToChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const enhance = compose<IWithHandlerProps, {}>(
@@ -46,13 +49,13 @@ const enhance = compose<IWithHandlerProps, {}>(
   withState('palette', 'setPalette', DEFAULT_PALETTE),
   withState('timeMs', 'setTimeMs', 60000),
   withState('playing', 'setPlaying', false),
-  withState('textReel', 'setTextReel', []),
+  withState('textSpecs', 'setTextSpecs', []),
   withHandlers({
     handleSrcChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
       props.setImgSrc(event.currentTarget.value);
     },
     handlePaletteChange: (props: IWithStateProps) => (palette: IPalette) => {
-      props.setPalette({...palette});
+      props.setPalette({ ...palette });
     },
     handleColorChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
       props.setPalette({ ...props.palette, color: event.currentTarget.value });
@@ -71,7 +74,7 @@ const enhance = compose<IWithHandlerProps, {}>(
     },
     handleTimeMsChange: (props: IWithStateProps) => (timeMs: string | number) => {
       const nextTimeMs = typeof timeMs === 'string' ? parseInt(timeMs, 10) : timeMs;
-      
+
       if (!isNaN(nextTimeMs)) {
         props.setTimeMs(nextTimeMs);
       }
@@ -89,7 +92,74 @@ const enhance = compose<IWithHandlerProps, {}>(
     },
     handlePause: (props: IWithStateProps) => () => {
       props.setPlaying(false);
-    }
+    },
+    addTextSpec: (props: IWithStateProps) => () => {
+      const nextTextSpecs: ITextSpec[] = props.textSpecs.map(textSpec => ({ ...textSpec }));
+      const from: number = get(last(nextTextSpecs), 'to', 0);
+      const to: number = from + 5000;
+
+      nextTextSpecs.push({ text: '', from, to });
+
+      props.setTextSpecs(nextTextSpecs);
+    },
+    removeTextSpec: (props: IWithStateProps) => () => {
+      const nextTextSpecs: ITextSpec[] = props.textSpecs.map(textSpec => ({ ...textSpec }));
+
+      nextTextSpecs.pop();
+
+      props.setTextSpecs(nextTextSpecs);
+    },
+    handleTextSpecTextChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { currentTarget } = event;
+      const ndx = currentTarget.getAttribute('data-ndx');
+
+      if (!ndx) {
+        return;
+      }
+
+      const nextTextSpecs = props.textSpecs.map(textSpec => ({ ...textSpec }));
+      nextTextSpecs[ndx].text = currentTarget.value;
+
+      props.setTextSpecs(nextTextSpecs);
+    },
+    handleTextSpecFromChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { currentTarget } = event;
+      const ndx = currentTarget.getAttribute('data-ndx');
+
+      if (!ndx) {
+        return;
+      }
+
+      const from = parseInt(currentTarget.value, 10);
+
+      if (isNaN(from)) {
+        return;
+      }
+
+      const nextTextSpecs = props.textSpecs.map(textSpec => ({ ...textSpec }));
+      nextTextSpecs[ndx].from = from;
+
+      props.setTextSpecs(nextTextSpecs);
+    },
+    handleTextSpecToChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { currentTarget } = event;
+      const ndx = currentTarget.getAttribute('data-ndx');
+
+      if (!ndx) {
+        return;
+      }
+
+      const to = parseInt(currentTarget.value, 10);
+
+      if (isNaN(to)) {
+        return;
+      }
+
+      const nextTextSpecs = props.textSpecs.map(textSpec => ({ ...textSpec }));
+      nextTextSpecs[ndx].to = to;
+
+      props.setTextSpecs(nextTextSpecs);
+    },
   })
 );
 
@@ -111,9 +181,24 @@ const ColorBox = styled('div') <IColorBoxProps>`
 export const Editor = enhance(props => (
   <Style>
     <Row gutter={24}>
-      <Col xs={24} sm={24} md={24} lg={6} xl={6} xxl={6}>
+      <Col xs={12} sm={12} md={12} lg={4} xl={4} xxl={4}>
         <Form>
+          <h3>main</h3>
           <Form.Item label="img src">
+            <Input
+              disabled={props.playing}
+              value={props.imgSrc}
+              onChange={props.handleSrcChange}
+            />
+          </Form.Item>
+          <Form.Item label="song name">
+            <Input
+              disabled={props.playing}
+              value={props.imgSrc}
+              onChange={props.handleSrcChange}
+            />
+          </Form.Item>
+          <Form.Item label="artist name">
             <Input
               disabled={props.playing}
               value={props.imgSrc}
@@ -151,6 +236,7 @@ export const Editor = enhance(props => (
             </Upload>
           </Form.Item>
           <Divider />
+          <h3>color</h3>
           <Form.Item label="color">
             <Input
               disabled={props.playing}
@@ -182,7 +268,46 @@ export const Editor = enhance(props => (
           </Form.Item>
         </Form>
       </Col>
-      <Col xs={24} sm={24} md={24} lg={18} xl={18} xxl={18}>
+      <Col xs={12} sm={12} md={12} lg={4} xl={4} xxl={4}>
+        <h3>text</h3>
+        <Button
+          disabled={props.playing}
+          onClick={props.addTextSpec}
+        >
+          <Icon type="plus" /> text
+          </Button>
+        <Button
+          disabled={props.playing}
+          onClick={props.removeTextSpec}
+        >
+          <Icon type="minus" /> text
+          </Button>
+        {
+          props.textSpecs.map(({ text, from, to }, ndx) => (
+            <Form.Item label={`text ${ndx + 1}`} key={`text-spec-${ndx}`}>
+              <Input
+                data-ndx={ndx}
+                disabled={props.playing}
+                value={text}
+                onChange={props.handleTextSpecTextChange}
+              />
+              <Input
+                data-ndx={ndx}
+                disabled={props.playing}
+                value={from}
+                onChange={props.handleTextSpecFromChange}
+              />
+              <Input
+                data-ndx={ndx}
+                disabled={props.playing}
+                value={to}
+                onChange={props.handleTextSpecToChange}
+              />
+            </Form.Item>
+          ))
+        }
+      </Col>
+      <Col xs={24} sm={24} md={24} lg={14} xl={14} xxl={14}>
         <Preview
           src={props.imgSrc}
           palette={props.palette}
