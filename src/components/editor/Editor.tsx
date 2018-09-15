@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { Row, Col, Form, Input, Button, Divider, InputNumber } from 'antd';
+import { Row, Icon, Col, Form, Input, Button, Divider, InputNumber, Upload } from 'antd';
 import styled from 'react-emotion';
 import { Preview } from '../preview';
 import { compose, withState, withHandlers } from 'recompose';
 import { IPalette } from 'types/palette';
 import { DEFAULT_PALETTE } from 'constants/DEFAULT_PALETTE';
 import { Audio } from '../audio';
+import { UploadChangeParam } from 'antd/lib/upload';
 
 interface IWithStateProps {
   imgSrc: string;
@@ -19,6 +20,7 @@ interface IWithStateProps {
   setBackgroundColor: (backgroundColor: string) => void;
   setAlternativeColor: (alternativeColor: string) => void;
   setTimeMs: (timeMs: number) => void;
+  setMusicSrc: (musicSrc: string) => void;
 }
 
 interface IWithHandlerProps extends IWithStateProps {
@@ -29,6 +31,7 @@ interface IWithHandlerProps extends IWithStateProps {
   handleAlternativeColorChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   resetPalette: (event: React.SyntheticEvent) => void;
   handleTimeMsChange: (timeMs: string | number) => void;
+  handleMusicSrcChange: (info: UploadChangeParam) => void
 }
 
 const enhance = compose<IWithHandlerProps, {}>(
@@ -70,6 +73,10 @@ const enhance = compose<IWithHandlerProps, {}>(
       if (!isNaN(nextTimeMs)) {
         props.setTimeMs(nextTimeMs);
       }
+    },
+    handleMusicSrcChange: (props: IWithStateProps) => (info: UploadChangeParam) => {
+      const musicSrc = URL.createObjectURL(info.file.originFileObj);
+      props.setMusicSrc(musicSrc);
     }
   })
 );
@@ -92,7 +99,7 @@ const ColorBox = styled('div') <IColorBoxProps>`
 export const Editor = enhance(props => (
   <Style>
     <Row gutter={24}>
-      <Col span={6}>
+      <Col xs={24} sm={24} md={24} lg={6} xl={6} xxl={6}>
         <Form>
           <Form.Item label="img src">
             <Input value={props.imgSrc} onChange={props.handleSrcChange} />
@@ -103,6 +110,26 @@ export const Editor = enhance(props => (
               step={1}
               value={props.timeMs}
               onChange={props.handleTimeMsChange} />
+          </Form.Item>
+          <Form.Item>
+            <Upload
+              accept="audio/*"
+              defaultFileList={[
+                {
+                  uid: '-1',
+                  name: props.musicSrc,
+                  status: 'done',
+                  url: props.musicSrc,
+                  size: 0,
+                  type: 'file'
+                }
+              ]}
+              onChange={props.handleMusicSrcChange}
+            >
+              <Button block={true}>
+                <Icon type="upload" /> upload music
+              </Button>
+            </Upload>
           </Form.Item>
           <Divider />
           <Form.Item label="color">
@@ -118,17 +145,13 @@ export const Editor = enhance(props => (
             <ColorBox color={props.alternativeColor} />
           </Form.Item>
           <Form.Item>
-            <Button
-              block={true}
-              type="primary"
-              onClick={props.resetPalette}
-            >
-              reset palette
+            <Button onClick={props.resetPalette}>
+              <Icon type="reload" /> reset palette
             </Button>
           </Form.Item>
         </Form>
       </Col>
-      <Col span={18}>
+      <Col xs={24} sm={24} md={24} lg={18} xl={18} xxl={18}>
         <Preview
           src={props.imgSrc}
           onPaletteChange={props.handlePaletteChange}
