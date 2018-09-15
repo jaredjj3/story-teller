@@ -12,27 +12,71 @@ const enhance = compose<IOuterProps, IOuterProps>(
 
 );
 
-interface IStyleProps {
-  palette: IPalette;
-}
-
-const Style = styled('div')<IStyleProps>`
+const Style = styled('div')<{palette: IPalette}>`
   width: 640px;
   height: 640px;
-  border: 3px solid red;
+  border: 4px solid red;
   color: ${props => props.palette.color};
   background-color: ${props => props.palette.backgroundColor};
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 `
 
-const StyledImg = styled('img')`
+const Text1 = styled('div')`
+  font-size: 1.5em;
+  height: 1.5em;
+  width: 100%;
+`;
+
+const Text2 = styled('div')`
+  font-size: 1em;
+  height: 1em;
+  width: 100%;
+`;
+
+const Centered = styled('div')`
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   width: 50%;
-  height: 50%;
+  margin: 0 auto;
+`;
+
+const StyledImg = styled('img')`
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  margin-top: 12px;
+`;
+
+const Fuse = styled('div')<{palette: IPalette}>`
+  width: 100%;
+  height: 1em;
+  background-color: ${props => props.palette.alternativeColor};
+  margin-top: 12px;
+`;
+
+const WaterMark = styled('div')<{palette: IPalette}>`
+  color: ${props => props.palette.color};
+  margin-top: 12px;
+  width: 100%;
+  font-size: 1em;
 `;
 
 export const ActionBox = enhance(props => (
   <Style palette={props.palette}>
-    <div>
+    <Centered>
+      <Text1>
+        night time blues
+      </Text1>
+      <Text2>
+        casteluzzo
+      </Text2>
       <StyledImg src={props.src} />
-    </div>
+      <Fuse palette={props.palette} />
+      <WaterMark palette={props.palette}>@jaredplaysguitar</WaterMark>
+    </Centered>
   </Style>
 ));
