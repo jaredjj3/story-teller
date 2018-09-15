@@ -19,6 +19,9 @@ interface IWithStateProps {
 interface IWithHandlerProps extends IWithStateProps {
   handleSrcChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handlePaletteChange: (palette: IPalette) => void;
+  handleColorChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleBackgroundColorChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleAlternativeColorChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const enhance = compose<IWithHandlerProps, {}>(
@@ -35,12 +38,32 @@ const enhance = compose<IWithHandlerProps, {}>(
       props.setColor(color);
       props.setBackgroundColor(backgroundColor);
       props.setAlternativeColor(alternativeColor);
+    },
+    handleColorChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      props.setColor(event.currentTarget.value);
+    },
+    handleBackgroundColorChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      props.setBackgroundColor(event.currentTarget.value);
+    },
+    handleAlternativeColorChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      props.setAlternativeColor(event.currentTarget.value);
     }
   })
 );
 
 const Style = styled('div')`
   padding-right: 12px;
+`;
+
+interface IColorBoxProps {
+  color: string;
+}
+
+const ColorBox = styled('div')<IColorBoxProps>`
+  border: 1px solid black;
+  background-color: ${props => props.color};
+  height: 16px;
+  margin-top: 4px;
 `;
 
 export const Editor = enhance(props => (
@@ -50,6 +73,18 @@ export const Editor = enhance(props => (
         <Form>
           <Form.Item label="src">
             <Input value={props.src} onChange={props.handleSrcChange} />
+          </Form.Item>
+          <Form.Item label="color">
+            <Input value={props.color} onChange={props.handleColorChange} />
+            <ColorBox color={props.color} />
+          </Form.Item>
+          <Form.Item label="background color">
+            <Input value={props.backgroundColor} onChange={props.handleBackgroundColorChange} />
+            <ColorBox color={props.backgroundColor} />
+          </Form.Item>
+          <Form.Item label="alternative color">
+            <Input value={props.alternativeColor} onChange={props.handleAlternativeColorChange} />
+            <ColorBox color={props.alternativeColor} />
           </Form.Item>
         </Form>
       </Col>
