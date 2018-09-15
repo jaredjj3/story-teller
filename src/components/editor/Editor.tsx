@@ -75,8 +75,12 @@ const enhance = compose<IWithHandlerProps, {}>(
       }
     },
     handleMusicSrcChange: (props: IWithStateProps) => (info: UploadChangeParam) => {
-      const musicSrc = URL.createObjectURL(info.file.originFileObj);
-      props.setMusicSrc(musicSrc);
+      try {
+        const musicSrc = URL.createObjectURL(info.file.originFileObj);
+        props.setMusicSrc(musicSrc);
+      } catch (error) {
+        props.setMusicSrc('');
+      }
     }
   })
 );
@@ -114,6 +118,7 @@ export const Editor = enhance(props => (
           <Form.Item>
             <Upload
               accept="audio/*"
+              multiple={false}
               defaultFileList={[
                 {
                   uid: '-1',
