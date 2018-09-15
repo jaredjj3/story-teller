@@ -5,6 +5,7 @@ import ImagePalette from 'react-image-palette';
 import { SyncPalette } from './SyncPalette';
 import { DEFAULT_PALETTE } from 'constants/DEFAULT_PALETTE';
 import styled from 'react-emotion';
+import { ActionBox } from './ActionBox';
 
 interface IOuterProps {
   src: string;
@@ -52,7 +53,6 @@ const Style = styled('div')`
 
 export const Preview = enhance(props => (
   <Style>
-    <img src={props.src} />
     <ImagePalette
       crossOrigin={true}
       image={props.src}
@@ -60,5 +60,6 @@ export const Preview = enhance(props => (
     >
       {(palette: IPalette) => <SyncPalette onPaletteChange={props.onPaletteChange} palette={palette} />}
     </ImagePalette>
+    <ActionBox src={props.src} />
   </Style>
 ));
