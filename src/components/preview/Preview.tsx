@@ -9,6 +9,7 @@ import { ActionBox } from './ActionBox';
 
 interface IOuterProps {
   src: string;
+  palette: IPalette;
   onPaletteChange: (palette: IPalette) => void;
 }
 
@@ -60,6 +61,9 @@ export const Preview = enhance(props => (
     >
       {(palette: IPalette) => <SyncPalette onPaletteChange={props.onPaletteChange} palette={palette} />}
     </ImagePalette>
-    <ActionBox src={props.src} />
+    <ActionBox
+      palette={props.palette}
+      src={props.src}
+    />
   </Style>
 ));
