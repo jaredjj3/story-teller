@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Row, Col, Form, Input, Button, Divider } from 'antd';
+import { Row, Col, Form, Input, Button, Divider, InputNumber } from 'antd';
 import styled from 'react-emotion';
 import { Preview } from '../preview';
 import { compose, withState, withHandlers } from 'recompose';
@@ -11,10 +11,12 @@ interface IWithStateProps {
   color: string;
   backgroundColor: string;
   alternativeColor: string;
+  timeMs: number;
   setSrc: (src: string) => void;
   setColor: (color: string) => void;
   setBackgroundColor: (backgroundColor: string) => void;
   setAlternativeColor: (alternativeColor: string) => void;
+  setTimeMs: (timeMs: number) => void;
 }
 
 interface IWithHandlerProps extends IWithStateProps {
@@ -24,6 +26,7 @@ interface IWithHandlerProps extends IWithStateProps {
   handleBackgroundColorChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleAlternativeColorChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   resetPalette: (event: React.SyntheticEvent) => void;
+  handleTimeMsChange: (timeMs: string | number) => void;
 }
 
 const enhance = compose<IWithHandlerProps, {}>(
@@ -57,6 +60,13 @@ const enhance = compose<IWithHandlerProps, {}>(
       const { src } = props;
       props.setSrc('');
       window.setTimeout(() => props.setSrc(src), 0);
+    },
+    handleTimeMsChange: (props: IWithStateProps) => (timeMs: string | number) => {
+      const nextTimeMs = typeof timeMs === 'string' ? parseInt(timeMs, 10) : timeMs;
+      
+      if (!isNaN(nextTimeMs)) {
+        props.setTimeMs(nextTimeMs);
+      }
     }
   })
 );
@@ -83,6 +93,13 @@ export const Editor = enhance(props => (
         <Form>
           <Form.Item label="src">
             <Input value={props.src} onChange={props.handleSrcChange} />
+          </Form.Item>
+          <Form.Item label="time ms">
+            <InputNumber
+              min={1}
+              step={1}
+              value={props.timeMs}
+              onChange={props.handleTimeMsChange} />
           </Form.Item>
           <Divider />
           <Form.Item label="color">
