@@ -3,6 +3,7 @@ import { compose, branch, renderNothing, withState, lifecycle, withHandlers } fr
 import { IPalette } from 'types/palette';
 import ImagePalette from 'react-image-palette';
 import { SyncPalette } from './SyncPalette';
+import { DEFAULT_PALETTE } from 'constants/DEFAULT_PALETTE';
 
 interface IOuterProps {
   src: string;
@@ -32,17 +33,25 @@ const enhance = compose<IWithHandlerProps, IOuterProps>(
     componentDidMount() {
       this.props.testImgSrc();
     },
-    componentDidUpdate() {
-      this.props.testImgSrc();
+    componentDidUpdate(prevProps) {
+      // Validate the imgSrc
+      if (this.props.src !== prevProps.src) {
+        this.props.setIsSrcValid(false);
+        this.props.testImgSrc();
+      }
     }
   }),
-  branch<IWithStateProps>(props => !props.isSrcValid, renderNothing)
+  branch<IWithHandlerProps>(props => !props.isSrcValid, renderNothing)
 );
 
 export const Preview = enhance(props => (
   <div>
     <img src={props.src} />
-    <ImagePalette crossOrigin={true} image={props.src}>
+    <ImagePalette
+      crossOrigin={true}
+      image={props.src}
+      defaults={DEFAULT_PALETTE}
+    >
       {
         (palette: IPalette) => (
           <SyncPalette onPaletteChange={props.onPaletteChange} palette={palette} />
