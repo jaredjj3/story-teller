@@ -15,12 +15,14 @@ interface IWithStateProps {
   backgroundColor: string;
   alternativeColor: string;
   timeMs: number;
+  playing: boolean;
   setImgSrc: (src: string) => void;
   setColor: (color: string) => void;
   setBackgroundColor: (backgroundColor: string) => void;
   setAlternativeColor: (alternativeColor: string) => void;
   setTimeMs: (timeMs: number) => void;
   setMusicSrc: (musicSrc: string) => void;
+  setPlaying: (playing: boolean) => void;
 }
 
 interface IWithHandlerProps extends IWithStateProps {
@@ -32,6 +34,8 @@ interface IWithHandlerProps extends IWithStateProps {
   resetPalette: (event: React.SyntheticEvent) => void;
   handleTimeMsChange: (timeMs: string | number) => void;
   handleMusicSrcChange: (info: UploadChangeParam) => void
+  handlePlay: () => void;
+  handlePause: () => void;
 }
 
 const enhance = compose<IWithHandlerProps, {}>(
@@ -81,6 +85,12 @@ const enhance = compose<IWithHandlerProps, {}>(
       } catch (error) {
         props.setMusicSrc('');
       }
+    },
+    handlePlay: (props: IWithStateProps) => () => {
+      props.setPlaying(true);
+    },
+    handlePause: (props: IWithStateProps) => () => {
+      props.setPlaying(false);
     }
   })
 );
@@ -106,10 +116,15 @@ export const Editor = enhance(props => (
       <Col xs={24} sm={24} md={24} lg={6} xl={6} xxl={6}>
         <Form>
           <Form.Item label="img src">
-            <Input value={props.imgSrc} onChange={props.handleSrcChange} />
+            <Input
+              disabled={props.playing}
+              value={props.imgSrc}
+              onChange={props.handleSrcChange}
+            />
           </Form.Item>
           <Form.Item label="time ms">
             <InputNumber
+              disabled={props.playing}
               min={1}
               step={1}
               value={props.timeMs}
@@ -117,6 +132,7 @@ export const Editor = enhance(props => (
           </Form.Item>
           <Form.Item>
             <Upload
+              disabled={props.playing}
               accept="audio/*"
               multiple={false}
               defaultFileList={[
@@ -131,26 +147,38 @@ export const Editor = enhance(props => (
               ]}
               onChange={props.handleMusicSrcChange}
             >
-              <Button block={true}>
+              <Button disabled={props.playing}>
                 <Icon type="upload" /> upload music
               </Button>
             </Upload>
           </Form.Item>
           <Divider />
           <Form.Item label="color">
-            <Input value={props.color} onChange={props.handleColorChange} />
+            <Input
+              disabled={props.playing}
+              value={props.color}
+              onChange={props.handleColorChange}
+            />
             <ColorBox color={props.color} />
           </Form.Item>
           <Form.Item label="background color">
-            <Input value={props.backgroundColor} onChange={props.handleBackgroundColorChange} />
+            <Input
+              disabled={props.playing}
+              value={props.backgroundColor}
+              onChange={props.handleBackgroundColorChange}
+            />
             <ColorBox color={props.backgroundColor} />
           </Form.Item>
           <Form.Item label="alternative color">
-            <Input value={props.alternativeColor} onChange={props.handleAlternativeColorChange} />
+            <Input
+              disabled={props.playing}
+              value={props.alternativeColor}
+              onChange={props.handleAlternativeColorChange}
+            />
             <ColorBox color={props.alternativeColor} />
           </Form.Item>
           <Form.Item>
-            <Button onClick={props.resetPalette}>
+            <Button disabled={props.playing} onClick={props.resetPalette}>
               <Icon type="reload" /> reset palette
             </Button>
           </Form.Item>
@@ -161,7 +189,11 @@ export const Editor = enhance(props => (
           src={props.imgSrc}
           onPaletteChange={props.handlePaletteChange}
         />
-        <Audio src={props.musicSrc} />
+        <Audio
+          onPlay={props.handlePlay}
+          onPause={props.handlePause}
+          src={props.musicSrc}
+        />
       </Col>
     </Row>
   </Style>
