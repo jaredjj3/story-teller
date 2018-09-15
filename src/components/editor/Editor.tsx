@@ -3,16 +3,18 @@ import { Row, Col, Form, Input, Button, Divider, InputNumber } from 'antd';
 import styled from 'react-emotion';
 import { Preview } from '../preview';
 import { compose, withState, withHandlers } from 'recompose';
-import { IPalette } from '../../types/palette';
+import { IPalette } from 'types/palette';
 import { DEFAULT_PALETTE } from 'constants/DEFAULT_PALETTE';
+import { Audio } from '../audio';
 
 interface IWithStateProps {
-  src: string;
+  imgSrc: string;
+  musicSrc: any;
   color: string;
   backgroundColor: string;
   alternativeColor: string;
   timeMs: number;
-  setSrc: (src: string) => void;
+  setImgSrc: (src: string) => void;
   setColor: (color: string) => void;
   setBackgroundColor: (backgroundColor: string) => void;
   setAlternativeColor: (alternativeColor: string) => void;
@@ -30,7 +32,8 @@ interface IWithHandlerProps extends IWithStateProps {
 }
 
 const enhance = compose<IWithHandlerProps, {}>(
-  withState('src', 'setSrc', 'https://i.scdn.co/image/c86f5f7a542e81c14ec6a65f009a2ab801e32272'),
+  withState('imgSrc', 'setImgSrc', 'default_image.jpeg'),
+  withState('musicSrc', 'setMusicSrc', 'default_audio.m4a'),
   withState('color', 'setColor', DEFAULT_PALETTE.color),
   withState('backgroundColor', 'setBackgroundColor', DEFAULT_PALETTE.backgroundColor),
   withState('alternativeColor', 'setAlternativeColor', DEFAULT_PALETTE.alternativeColor),
@@ -38,7 +41,7 @@ const enhance = compose<IWithHandlerProps, {}>(
   withState('playing', 'setPlaying', false),
   withHandlers({
     handleSrcChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      props.setSrc(event.currentTarget.value);
+      props.setImgSrc(event.currentTarget.value);
     },
     handlePaletteChange: (props: IWithStateProps) => (palette: IPalette) => {
       const { color, backgroundColor, alternativeColor } = palette;
@@ -57,9 +60,9 @@ const enhance = compose<IWithHandlerProps, {}>(
     },
     resetPalette: (props: IWithStateProps) => (event: React.SyntheticEvent) => {
       event.preventDefault();
-      const { src } = props;
-      props.setSrc('');
-      window.setTimeout(() => props.setSrc(src), 0);
+      const { imgSrc } = props;
+      props.setImgSrc('');
+      window.setTimeout(() => props.setImgSrc(imgSrc), 0);
     },
     handleTimeMsChange: (props: IWithStateProps) => (timeMs: string | number) => {
       const nextTimeMs = typeof timeMs === 'string' ? parseInt(timeMs, 10) : timeMs;
@@ -91,8 +94,8 @@ export const Editor = enhance(props => (
     <Row gutter={24}>
       <Col span={6}>
         <Form>
-          <Form.Item label="src">
-            <Input value={props.src} onChange={props.handleSrcChange} />
+          <Form.Item label="img src">
+            <Input value={props.imgSrc} onChange={props.handleSrcChange} />
           </Form.Item>
           <Form.Item label="time ms">
             <InputNumber
@@ -123,14 +126,14 @@ export const Editor = enhance(props => (
               reset palette
             </Button>
           </Form.Item>
-          <Divider />
         </Form>
       </Col>
       <Col span={18}>
         <Preview
-          src={props.src}
+          src={props.imgSrc}
           onPaletteChange={props.handlePaletteChange}
         />
+        <Audio src={props.musicSrc} />
       </Col>
     </Row>
   </Style>
