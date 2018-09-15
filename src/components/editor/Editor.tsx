@@ -11,15 +11,11 @@ import { UploadChangeParam } from 'antd/lib/upload';
 interface IWithStateProps {
   imgSrc: string;
   musicSrc: any;
-  color: string;
-  backgroundColor: string;
-  alternativeColor: string;
+  palette: IPalette;
   timeMs: number;
   playing: boolean;
+  setPalette: (palette: IPalette) => void;
   setImgSrc: (src: string) => void;
-  setColor: (color: string) => void;
-  setBackgroundColor: (backgroundColor: string) => void;
-  setAlternativeColor: (alternativeColor: string) => void;
   setTimeMs: (timeMs: number) => void;
   setMusicSrc: (musicSrc: string) => void;
   setPlaying: (playing: boolean) => void;
@@ -41,9 +37,7 @@ interface IWithHandlerProps extends IWithStateProps {
 const enhance = compose<IWithHandlerProps, {}>(
   withState('imgSrc', 'setImgSrc', 'default_image.jpeg'),
   withState('musicSrc', 'setMusicSrc', 'default_audio.m4a'),
-  withState('color', 'setColor', DEFAULT_PALETTE.color),
-  withState('backgroundColor', 'setBackgroundColor', DEFAULT_PALETTE.backgroundColor),
-  withState('alternativeColor', 'setAlternativeColor', DEFAULT_PALETTE.alternativeColor),
+  withState('palette', 'setPalette', DEFAULT_PALETTE),
   withState('timeMs', 'setTimeMs', 60000),
   withState('playing', 'setPlaying', false),
   withHandlers({
@@ -51,19 +45,16 @@ const enhance = compose<IWithHandlerProps, {}>(
       props.setImgSrc(event.currentTarget.value);
     },
     handlePaletteChange: (props: IWithStateProps) => (palette: IPalette) => {
-      const { color, backgroundColor, alternativeColor } = palette;
-      props.setColor(color);
-      props.setBackgroundColor(backgroundColor);
-      props.setAlternativeColor(alternativeColor);
+      props.setPalette({...palette});
     },
     handleColorChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      props.setColor(event.currentTarget.value);
+      props.setPalette({ ...props.palette, color: event.currentTarget.value });
     },
     handleBackgroundColorChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      props.setBackgroundColor(event.currentTarget.value);
+      props.setPalette({ ...props.palette, backgroundColor: event.currentTarget.value });
     },
     handleAlternativeColorChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      props.setAlternativeColor(event.currentTarget.value);
+      props.setPalette({ ...props.palette, alternativeColor: event.currentTarget.value });
     },
     resetPalette: (props: IWithStateProps) => (event: React.SyntheticEvent) => {
       event.preventDefault();
@@ -156,26 +147,26 @@ export const Editor = enhance(props => (
           <Form.Item label="color">
             <Input
               disabled={props.playing}
-              value={props.color}
+              value={props.palette.color}
               onChange={props.handleColorChange}
             />
-            <ColorBox color={props.color} />
+            <ColorBox color={props.palette.color} />
           </Form.Item>
           <Form.Item label="background color">
             <Input
               disabled={props.playing}
-              value={props.backgroundColor}
+              value={props.palette.backgroundColor}
               onChange={props.handleBackgroundColorChange}
             />
-            <ColorBox color={props.backgroundColor} />
+            <ColorBox color={props.palette.backgroundColor} />
           </Form.Item>
           <Form.Item label="alternative color">
             <Input
               disabled={props.playing}
-              value={props.alternativeColor}
+              value={props.palette.alternativeColor}
               onChange={props.handleAlternativeColorChange}
             />
-            <ColorBox color={props.alternativeColor} />
+            <ColorBox color={props.palette.alternativeColor} />
           </Form.Item>
           <Form.Item>
             <Button disabled={props.playing} onClick={props.resetPalette}>
