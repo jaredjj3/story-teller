@@ -178,6 +178,7 @@ export const Editor = enhance(props => (
       <Col xs={24} sm={24} md={24} lg={18} xl={18} xxl={18}>
         <Preview
           src={props.imgSrc}
+          palette={props.palette}
           onPaletteChange={props.handlePaletteChange}
         />
         <Audio
