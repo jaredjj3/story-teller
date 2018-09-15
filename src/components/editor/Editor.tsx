@@ -8,6 +8,12 @@ import { DEFAULT_PALETTE } from 'constants/DEFAULT_PALETTE';
 import { Audio } from '../audio';
 import { UploadChangeParam } from 'antd/lib/upload';
 
+interface ITextReelSpec {
+  text: string;
+  from: number;
+  to: number;
+}
+
 interface IWithStateProps {
   imgSrc: string;
   musicSrc: any;
@@ -40,6 +46,7 @@ const enhance = compose<IWithHandlerProps, {}>(
   withState('palette', 'setPalette', DEFAULT_PALETTE),
   withState('timeMs', 'setTimeMs', 60000),
   withState('playing', 'setPlaying', false),
+  withState('textReel', 'setTextReel', []),
   withHandlers({
     handleSrcChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
       props.setImgSrc(event.currentTarget.value);
