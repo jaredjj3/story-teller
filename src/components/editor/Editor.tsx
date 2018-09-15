@@ -9,6 +9,7 @@ import { Audio } from '../audio';
 import { UploadChangeParam } from 'antd/lib/upload';
 import { ITextSpec } from 'types/text-spec';
 import { last, get } from 'lodash';
+import { DEFAULT_TEXT_SPECS } from 'constants/DEFAULT_TEXT_SPECS';
 
 interface IWithStateProps {
   imgSrc: string;
@@ -17,12 +18,16 @@ interface IWithStateProps {
   timeMs: number;
   playing: boolean;
   textSpecs: ITextSpec[];
+  songName: string;
+  artistName: string;
   setPalette: (palette: IPalette) => void;
   setImgSrc: (src: string) => void;
   setTimeMs: (timeMs: number) => void;
   setMusicSrc: (musicSrc: string) => void;
   setPlaying: (playing: boolean) => void;
   setTextSpecs: (textSpecs: ITextSpec[]) => void;
+  setSongName: (songName: string) => void;
+  setArtistName: (artistName: string) => void;
 }
 
 interface IWithHandlerProps extends IWithStateProps {
@@ -41,6 +46,8 @@ interface IWithHandlerProps extends IWithStateProps {
   handleTextSpecTextChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleTextSpecFromChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleTextSpecToChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSongNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleArtistNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const enhance = compose<IWithHandlerProps, {}>(
@@ -49,7 +56,9 @@ const enhance = compose<IWithHandlerProps, {}>(
   withState('palette', 'setPalette', DEFAULT_PALETTE),
   withState('timeMs', 'setTimeMs', 60000),
   withState('playing', 'setPlaying', false),
-  withState('textSpecs', 'setTextSpecs', []),
+  withState('textSpecs', 'setTextSpecs', DEFAULT_TEXT_SPECS),
+  withState('songName', 'setSongName', 'night time blues'),
+  withState('artistName', 'setArtistName', 'castelluzzo'),
   withHandlers({
     handleSrcChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
       props.setImgSrc(event.currentTarget.value);
@@ -95,7 +104,7 @@ const enhance = compose<IWithHandlerProps, {}>(
     },
     addTextSpec: (props: IWithStateProps) => () => {
       const nextTextSpecs: ITextSpec[] = props.textSpecs.map(textSpec => ({ ...textSpec }));
-      const from: number = get(last(nextTextSpecs), 'to', 0);
+      const from: number = get(last(nextTextSpecs), 'to', 1000);
       const to: number = from + 5000;
 
       nextTextSpecs.push({ text: '', from, to });
@@ -160,6 +169,12 @@ const enhance = compose<IWithHandlerProps, {}>(
 
       props.setTextSpecs(nextTextSpecs);
     },
+    handleSongNameChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      props.setSongName(event.currentTarget.value);
+    },
+    handleArtistNameChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      props.setArtistName(event.currentTarget.value);
+    }
   })
 );
 
@@ -191,18 +206,18 @@ export const Editor = enhance(props => (
               onChange={props.handleSrcChange}
             />
           </Form.Item>
-          <Form.Item label="song name">
+          <Form.Item label="song">
             <Input
               disabled={props.playing}
-              value={props.imgSrc}
-              onChange={props.handleSrcChange}
+              value={props.songName}
+              onChange={props.handleSongNameChange}
             />
           </Form.Item>
-          <Form.Item label="artist name">
+          <Form.Item label="artist">
             <Input
               disabled={props.playing}
-              value={props.imgSrc}
-              onChange={props.handleSrcChange}
+              value={props.artistName}
+              onChange={props.handleArtistNameChange}
             />
           </Form.Item>
           <Form.Item label="time ms">
@@ -310,6 +325,8 @@ export const Editor = enhance(props => (
       <Col xs={24} sm={24} md={24} lg={14} xl={14} xxl={14}>
         <Preview
           src={props.imgSrc}
+          artistName={props.artistName}
+          songName={props.songName}
           palette={props.palette}
           onPaletteChange={props.handlePaletteChange}
         />

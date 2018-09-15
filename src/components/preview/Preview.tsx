@@ -10,6 +10,8 @@ import { ActionBox } from './ActionBox';
 interface IOuterProps {
   src: string;
   palette: IPalette;
+  artistName: string;
+  songName: string;
   onPaletteChange: (palette: IPalette) => void;
 }
 
@@ -62,8 +64,10 @@ export const Preview = enhance(props => (
       {(palette: IPalette) => <SyncPalette onPaletteChange={props.onPaletteChange} palette={palette} />}
     </ImagePalette>
     <ActionBox
-      palette={props.palette}
       src={props.src}
+      palette={props.palette}
+      artistName={props.artistName}
+      songName={props.songName}
     />
   </Style>
 ));

@@ -5,6 +5,8 @@ import { IPalette } from '../../types/palette';
 
 interface IOuterProps {
   src: string;
+  artistName: string;
+  songName: string;
   palette: IPalette;
 }
 
@@ -69,10 +71,10 @@ export const ActionBox = enhance(props => (
   <Style palette={props.palette}>
     <Centered>
       <Text1>
-        night time blues
+        {props.songName}
       </Text1>
       <Text2>
-        casteluzzo
+        {props.artistName}
       </Text2>
       <StyledImg src={props.src} />
       <Fuse palette={props.palette} />
