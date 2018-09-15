@@ -52,11 +52,7 @@ export const Preview = enhance(props => (
       image={props.src}
       defaults={DEFAULT_PALETTE}
     >
-      {
-        (palette: IPalette) => (
-          <SyncPalette onPaletteChange={props.onPaletteChange} palette={palette} />
-        )
-      }
+      {(palette: IPalette) => <SyncPalette onPaletteChange={props.onPaletteChange} palette={palette} />}
     </ImagePalette>
   </div>
 ));
