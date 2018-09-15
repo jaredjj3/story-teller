@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { compose, branch, renderNothing } from 'recompose';
-import { Divider } from 'antd';
 import styled from 'react-emotion';
 
 interface IOuterProps {
   src: string;
+  onPlay: () => void;
+  onPause: () => void;
 }
 
 const enhance = compose <IOuterProps, IOuterProps>(
@@ -19,6 +20,11 @@ const Style = styled('div')`
 
 export const Audio = enhance(props => (
   <Style>
-    <audio id="main-audio" controls={true} src={props.src} />
+    <audio
+      onPlay={props.onPlay}
+      onPause={props.onPause}
+      controls={true}
+      src={props.src}
+    />
   </Style>
 ));
