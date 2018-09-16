@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Row, Icon, Col, Form, Input, Button, Divider, InputNumber, Upload } from 'antd';
 import styled from 'react-emotion';
 import { Preview } from '../preview';
-import { compose, withState, withHandlers } from 'recompose';
+import { compose, withState, withHandlers, withProps } from 'recompose';
 import { IPalette } from 'types/palette';
 import { DEFAULT_PALETTE } from 'constants/DEFAULT_PALETTE';
 import { Audio } from '../audio';
@@ -10,6 +10,7 @@ import { UploadChangeParam } from 'antd/lib/upload';
 import { ITextSpec } from 'types/text-spec';
 import { last, get } from 'lodash';
 import { DEFAULT_TEXT_SPECS } from 'constants/DEFAULT_TEXT_SPECS';
+import { loop } from 'enhancers/loop';
 
 interface IWithStateProps {
   imgSrc: string;
@@ -20,6 +21,8 @@ interface IWithStateProps {
   songName: string;
   artistName: string;
   currentTimeMs: number;
+  textSpecNdx: number;
+  durationMs: number;
   setPalette: (palette: IPalette) => void;
   setImgSrc: (src: string) => void;
   setMusicSrc: (musicSrc: string) => void;
@@ -28,6 +31,8 @@ interface IWithStateProps {
   setSongName: (songName: string) => void;
   setArtistName: (artistName: string) => void;
   setCurrentTimeMs: (currentTimeMs: number) => void;
+  setTextSpecNdx: (textSpecNdx: number) => void;
+  setDurationMs: (durationMs: number) => void;
 }
 
 interface IWithHandlerProps extends IWithStateProps {
@@ -49,9 +54,23 @@ interface IWithHandlerProps extends IWithStateProps {
   handleSongNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleArtistNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   syncCurrentTimeMs: (currentTimeMs: number) => void;
+  syncDurationMs: (durationMs: number) => void;
 }
 
-const enhance = compose<IWithHandlerProps, {}>(
+interface ICurrentTextSpecProps extends IWithHandlerProps {
+  currentTextSpec: ITextSpec | null;
+}
+
+interface ITextProps extends ICurrentTextSpecProps {
+  text1: string;
+  text2: string;
+}
+
+interface IProgressProps extends ITextProps {
+  progress: number;
+}
+
+const enhance = compose<IProgressProps, {}>(
   withState('imgSrc', 'setImgSrc', 'default_image.jpeg'),
   withState('musicSrc', 'setMusicSrc', 'default_audio.m4a'),
   withState('palette', 'setPalette', DEFAULT_PALETTE),
@@ -61,6 +80,8 @@ const enhance = compose<IWithHandlerProps, {}>(
   withState('songName', 'setSongName', 'night time blues'),
   withState('artistName', 'setArtistName', 'castelluzzo'),
   withState('currentTimeMs', 'setCurrentTimeMs', 0),
+  withState('textSpecNdx', 'setTextSpecNdx', 0),
+  withState('durationMs', 'setDurationMs', 0),
   withHandlers({
     handleSrcChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
       props.setImgSrc(event.currentTarget.value);
@@ -93,6 +114,7 @@ const enhance = compose<IWithHandlerProps, {}>(
     },
     handlePlay: (props: IWithStateProps) => () => {
       props.setPlaying(true);
+      props.setTextSpecNdx(0);
     },
     handlePause: (props: IWithStateProps) => () => {
       props.setPlaying(false);
@@ -172,6 +194,39 @@ const enhance = compose<IWithHandlerProps, {}>(
     },
     syncCurrentTimeMs: (props: IWithStateProps) => (timeMs: number) => {
       props.setCurrentTimeMs(timeMs);
+    },
+    syncDurationMs: (props: IWithStateProps) => (durationMs: number) => {
+      props.setDurationMs(durationMs);
+    }
+  }),
+  withProps((props: IWithHandlerProps) => ({
+    currentTextSpec: props.textSpecs[props.textSpecNdx] || null
+  })),
+  withProps((props: ICurrentTextSpecProps) => {
+    let text1: string = '';
+    let text2: string = '';
+
+    const { currentTextSpec, currentTimeMs, songName, artistName } = props;
+
+    if (!currentTextSpec) {
+      text1 = songName;
+      text2 = artistName;
+    } else if (currentTextSpec.from < currentTimeMs && currentTextSpec.to > currentTimeMs) {
+      text1 = currentTextSpec.text;
+    }
+
+    return { text1, text2 };
+  }),
+  withProps((props: ITextProps) => ({
+    progress: props.currentTimeMs / props.durationMs
+  })),
+  loop<IProgressProps>(props => {
+    if (!props.currentTextSpec) {
+      return;
+    }
+
+    if (props.currentTimeMs > props.currentTextSpec.to) {
+      props.setTextSpecNdx(props.textSpecNdx + 1);
     }
   })
 );
@@ -199,28 +254,24 @@ export const Editor = enhance(props => (
           <h3>main</h3>
           <Form.Item label="img src">
             <Input
-              disabled={props.playing}
               value={props.imgSrc}
               onChange={props.handleSrcChange}
             />
           </Form.Item>
           <Form.Item label="song">
             <Input
-              disabled={props.playing}
               value={props.songName}
               onChange={props.handleSongNameChange}
             />
           </Form.Item>
           <Form.Item label="artist">
             <Input
-              disabled={props.playing}
               value={props.artistName}
               onChange={props.handleArtistNameChange}
             />
           </Form.Item>
           <Form.Item>
             <Upload
-              disabled={props.playing}
               accept="audio/*"
               multiple={false}
               defaultFileList={[
@@ -235,7 +286,7 @@ export const Editor = enhance(props => (
               ]}
               onChange={props.handleMusicSrcChange}
             >
-              <Button disabled={props.playing}>
+              <Button>
                 <Icon type="upload" /> upload music
               </Button>
             </Upload>
@@ -244,7 +295,6 @@ export const Editor = enhance(props => (
           <h3>color</h3>
           <Form.Item label="color">
             <Input
-              disabled={props.playing}
               value={props.palette.color}
               onChange={props.handleColorChange}
             />
@@ -252,7 +302,6 @@ export const Editor = enhance(props => (
           </Form.Item>
           <Form.Item label="background color">
             <Input
-              disabled={props.playing}
               value={props.palette.backgroundColor}
               onChange={props.handleBackgroundColorChange}
             />
@@ -260,14 +309,15 @@ export const Editor = enhance(props => (
           </Form.Item>
           <Form.Item label="alternative color">
             <Input
-              disabled={props.playing}
               value={props.palette.alternativeColor}
               onChange={props.handleAlternativeColorChange}
             />
             <ColorBox color={props.palette.alternativeColor} />
           </Form.Item>
           <Form.Item>
-            <Button disabled={props.playing} onClick={props.resetPalette}>
+            <Button
+              onClick={props.resetPalette}
+            >
               <Icon type="reload" /> reset palette
             </Button>
           </Form.Item>
@@ -276,13 +326,11 @@ export const Editor = enhance(props => (
       <Col xs={12} sm={12} md={12} lg={4} xl={4} xxl={4}>
         <h3>text</h3>
         <Button
-          disabled={props.playing}
           onClick={props.addTextSpec}
         >
           <Icon type="plus" /> text
           </Button>
         <Button
-          disabled={props.playing}
           onClick={props.removeTextSpec}
         >
           <Icon type="minus" /> text
@@ -292,19 +340,16 @@ export const Editor = enhance(props => (
             <Form.Item label={`text ${ndx + 1}`} key={`text-spec-${ndx}`}>
               <Input
                 data-ndx={ndx}
-                disabled={props.playing}
                 value={text}
                 onChange={props.handleTextSpecTextChange}
               />
               <Input
                 data-ndx={ndx}
-                disabled={props.playing}
                 value={from}
                 onChange={props.handleTextSpecFromChange}
               />
               <Input
                 data-ndx={ndx}
-                disabled={props.playing}
                 value={to}
                 onChange={props.handleTextSpecToChange}
               />
@@ -315,13 +360,15 @@ export const Editor = enhance(props => (
       <Col xs={24} sm={24} md={24} lg={14} xl={14} xxl={14}>
         <Preview
           src={props.imgSrc}
-          artistName={props.artistName}
-          songName={props.songName}
           palette={props.palette}
           onPaletteChange={props.handlePaletteChange}
+          text1={props.text1}
+          text2={props.text2}
+          progress={props.progress}
         />
         <Audio
-          syncCurrentTimeMs={props.syncCurrentTimeMs}
+          onCurrentTimeMsChange={props.syncCurrentTimeMs}
+          onDurationMsChange={props.syncDurationMs}
           onPlay={props.handlePlay}
           onPause={props.handlePause}
           src={props.musicSrc}
