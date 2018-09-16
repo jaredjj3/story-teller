@@ -32,6 +32,8 @@ const enhance = compose<IOuterProps, IOuterProps>(
 const Style = styled('div') <{ palette: IPalette }>`
   width: 640px;
   height: 640px;
+  min-width: 640px;
+  min-height: 640px;
   border: 4px solid red;
   color: ${props => props.palette.color};
   background-color: ${props => props.palette.backgroundColor};

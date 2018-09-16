@@ -327,6 +327,13 @@ export const Editor = enhance(props => (
                     <Icon type="minus" /> 1
                   </Button>
                 </ButtonGroup>
+                <Button
+                  style={{ marginLeft: '16px' }}
+                  type="danger"
+                  onClick={props.clearTextSpecs}
+                >
+                  remove all
+                </Button>
               </Form.Item>
               {
                 props.textSpecs.map(({ text, durationMs }, ndx) => (
@@ -347,11 +354,6 @@ export const Editor = enhance(props => (
                   </Form.Item>
                 ))
               }
-              <Form.Item>
-                <Button type="danger" onClick={props.clearTextSpecs}>
-                  remove all
-          </Button>
-              </Form.Item>
             </Form>
           </Tabs.TabPane>
         </Tabs>
