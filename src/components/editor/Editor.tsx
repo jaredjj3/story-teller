@@ -8,7 +8,6 @@ import { DEFAULT_PALETTE } from 'constants/DEFAULT_PALETTE';
 import { Audio } from '../audio';
 import { UploadChangeParam } from 'antd/lib/upload';
 import { ITextSpec } from 'types/text-spec';
-import { last, get } from 'lodash';
 import { DEFAULT_TEXT_SPECS } from 'constants/DEFAULT_TEXT_SPECS';
 import { loop } from 'enhancers/loop';
 import ButtonGroup from 'antd/lib/button/button-group';
@@ -121,6 +120,7 @@ const enhance = compose<IProgressProps, {}>(
     },
     handlePause: (props: IWithStateProps) => () => {
       props.setPlaying(false);
+      props.setTextSpecNdx(0);
     },
     addTextSpec: (props: IWithStateProps) => () => {
       const nextTextSpecs: ITextSpec[] = props.textSpecs.map(textSpec => ({ ...textSpec }));
@@ -237,7 +237,7 @@ export const Editor = enhance(props => (
   <Style>
     <Row gutter={24}>
       <Col xs={12} sm={12} md={12} lg={4} xl={4} xxl={4}>
-        <Form>
+        <Form layout="inline">
           <h3>main</h3>
           <Form.Item label="img src">
             <Input
@@ -310,37 +310,38 @@ export const Editor = enhance(props => (
       </Col>
       <Col xs={12} sm={12} md={12} lg={4} xl={4} xxl={4}>
         <h3>text</h3>
-        <Form.Item>
-          <ButtonGroup>
-            <Button onClick={props.addTextSpec}>
-              <Icon type="plus" /> 1
+        <Form layout="inline">
+          <Form.Item>
+            <ButtonGroup>
+              <Button onClick={props.addTextSpec}>
+                <Icon type="plus" /> 1
             </Button>
-            <Button onClick={props.removeTextSpec}>
-              <Icon type="minus" /> 1
+              <Button onClick={props.removeTextSpec}>
+                <Icon type="minus" /> 1
             </Button>
-          </ButtonGroup>
-        </Form.Item>
-        {
-          props.textSpecs.map(({ text, durationMs }, ndx) => (
-            <Form.Item label={`text ${ndx + 1}`} key={`text-spec-${ndx}`}>
-              <Input
-                value={text}
-                onChange={props.handleTextSpecTextChange(ndx)}
-              />
-              <InputNumber
-                min={0}
-                step={10}
-                value={durationMs}
-                onChange={props.handleTextSpecDurationMsChange(ndx)}
-              />
-            </Form.Item>
-          ))
-        }
-        <Form.Item>
-          <Button type="danger" onClick={props.clearTextSpecs}>
-            remove all
+            </ButtonGroup>
+          </Form.Item>
+          {
+            props.textSpecs.map(({ text, durationMs }, ndx) => (
+              <Form.Item label={`text ${ndx + 1}`} key={`text-spec-${ndx}`}>
+                <Input
+                  value={text}
+                  onChange={props.handleTextSpecTextChange(ndx)}
+                />
+                <InputNumber
+                  min={0}
+                  value={durationMs}
+                  onChange={props.handleTextSpecDurationMsChange(ndx)}
+                />
+              </Form.Item>
+            ))
+          }
+          <Form.Item>
+            <Button type="danger" onClick={props.clearTextSpecs}>
+              remove all
           </Button>
-        </Form.Item>
+          </Form.Item>
+        </Form>
       </Col>
       <Col xs={24} sm={24} md={24} lg={14} xl={14} xxl={14}>
         <Preview

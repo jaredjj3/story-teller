@@ -39,6 +39,7 @@ const enhance = compose <IWithHandlerProps, IOuterProps>(
       
       audioElement.currentTime = 0;
       audioElement.pause();
+      props.onPause();
       window.setTimeout(() => audioElement.play(), 500);
     },
     handlePlay: (props: IWithStateProps) => () => {
@@ -68,7 +69,7 @@ const Style = styled('div')`
 
 export const Audio = enhance(props => (
   <Style>
-    <Button onClick={props.handlePlayFromBeginning}>
+    <Button type="primary" onClick={props.handlePlayFromBeginning}>
       <Icon type="caret-right" /> from beginning
     </Button>
     <audio
