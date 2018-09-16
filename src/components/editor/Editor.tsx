@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Row, Icon, Col, Form, Input, Button, Upload, InputNumber, Tabs } from 'antd';
+import { Row, Icon, Col, Form, Input, Button, Upload, Tabs, Slider } from 'antd';
 import styled from 'react-emotion';
 import { Preview } from '../preview';
 import { compose, withState, withHandlers, withProps } from 'recompose';
@@ -43,7 +43,6 @@ interface IWithHandlerProps extends IWithStateProps {
   handleBackgroundColorChange: (color: ColorResult) => void;
   handleAlternativeColorChange: (color: ColorResult) => void;
   resetPalette: (event: React.SyntheticEvent) => void;
-  handleTimeMsChange: (timeMs: string | number) => void;
   handleMusicSrcChange: (info: UploadChangeParam) => void
   handlePlay: () => void;
   handlePause: () => void;
@@ -51,7 +50,7 @@ interface IWithHandlerProps extends IWithStateProps {
   removeTextSpec: () => void;
   clearTextSpecs: () => void;
   handleTextSpecTextChange: (ndx: number) => (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleTextSpecDurationMsChange: (ndx: number) => (value: number | string) => void;
+  handleTextSpecDurationMsChange: (ndx: number) => (value: number) => void;
   handleSongNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleArtistNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   syncCurrentTimeMs: (currentTimeMs: number) => void;
@@ -72,6 +71,19 @@ interface ITextProps extends ICurrentTextSpecProps {
 interface IProgressProps extends ITextProps {
   progress: number;
 }
+
+const MARKS_MAX = 5000;
+
+const MARKS_STEP = 1000;
+
+const SLIDER_MARKS = (() => {
+  const numMarks = MARKS_MAX / MARKS_STEP;
+  const marks = new Array(numMarks + 1).fill(null);
+  return marks.reduce((sliderMarks, mark, ndx) => {
+    sliderMarks[ndx * MARKS_STEP] = `${ndx}`;
+    return sliderMarks;
+  }, {})
+})();
 
 const colorToString = (color: ColorResult): string => {
   const { r, g, b, a } = color.rgb;
@@ -131,7 +143,7 @@ const enhance = compose<IProgressProps, {}>(
     addTextSpec: (props: IWithStateProps) => () => {
       const nextTextSpecs: ITextSpec[] = props.textSpecs.map(textSpec => ({ ...textSpec }));
 
-      nextTextSpecs.push({ text: '', durationMs: 1000 });
+      nextTextSpecs.push({ text: '', durationMs: 3000 });
 
       props.setTextSpecs(nextTextSpecs);
     },
@@ -151,15 +163,9 @@ const enhance = compose<IProgressProps, {}>(
 
       props.setTextSpecs(nextTextSpecs);
     },
-    handleTextSpecDurationMsChange: (props: IWithStateProps) => (ndx: number) => (value: string | number) => {
-      const durationMs = typeof value === 'string' ? parseInt(value, 10) : value;
-
-      if (isNaN(durationMs)) {
-        return;
-      }
-
+    handleTextSpecDurationMsChange: (props: IWithStateProps) => (ndx: number) => (value: number) => {
       const nextTextSpecs = props.textSpecs.map(textSpec => ({ ...textSpec }));
-      nextTextSpecs[ndx].durationMs = durationMs;
+      nextTextSpecs[ndx].durationMs = value;
 
       props.setTextSpecs(nextTextSpecs);
     },
@@ -228,9 +234,9 @@ const Style = styled('div')`
   padding-right: 12px;
 `;
 
-interface IColorBoxProps {
-  color: string;
-}
+const SliderMargin = styled('div')`
+  margin: 0px 8px;
+`;
 
 export const Editor = enhance(props => (
   <Style>
@@ -308,7 +314,7 @@ export const Editor = enhance(props => (
             </Form>
           </Tabs.TabPane>
           <Tabs.TabPane tab="text" key="3">
-            <Form layout="inline">
+            <Form>
               <Form.Item>
                 <ButtonGroup>
                   <Button onClick={props.addTextSpec}>
@@ -326,11 +332,15 @@ export const Editor = enhance(props => (
                       value={text}
                       onChange={props.handleTextSpecTextChange(ndx)}
                     />
-                    <InputNumber
-                      min={0}
-                      value={durationMs}
-                      onChange={props.handleTextSpecDurationMsChange(ndx)}
-                    />
+                    <SliderMargin>
+                      <Slider
+                        min={0}
+                        max={MARKS_MAX}
+                        marks={SLIDER_MARKS}
+                        value={durationMs}
+                        onChange={props.handleTextSpecDurationMsChange(ndx)}
+                      />
+                    </SliderMargin>
                   </Form.Item>
                 ))
               }
