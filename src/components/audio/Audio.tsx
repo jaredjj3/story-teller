@@ -7,7 +7,8 @@ interface IOuterProps {
   src: string;
   onPlay: () => void;
   onPause: () => void;
-  syncCurrentTimeMs: (timeMs: number) => void;
+  onCurrentTimeMsChange: (timeMs: number) => void;
+  onDurationMsChange: (durationMs: number) => void;
 }
 
 interface IWithStateProps extends IOuterProps {
@@ -46,14 +47,15 @@ const enhance = compose <IWithHandlerProps, IOuterProps>(
       props.audioElement.currentTime = 0;
     },
   }),
+  branch<IOuterProps>(props => !props.src, renderNothing),
   loop<IWithHandlerProps>(props => {
     if (!props.audioElement) {
       return;
     }
 
-    props.syncCurrentTimeMs(props.audioElement.currentTime * 1000);
+    props.onCurrentTimeMsChange(props.audioElement.currentTime * 1000);
+    props.onDurationMsChange(props.audioElement.duration * 1000);
   }),
-  branch<IOuterProps>(props => !props.src, renderNothing)
 );
 
 const Style = styled('div')`

@@ -5,16 +5,17 @@ import { IPalette } from '../../types/palette';
 
 interface IOuterProps {
   src: string;
-  artistName: string;
-  songName: string;
+  progress: number;
   palette: IPalette;
+  text1: string;
+  text2: string;
 }
 
 const enhance = compose<IOuterProps, IOuterProps>(
 
 );
 
-const Style = styled('div')<{palette: IPalette}>`
+const Style = styled('div') <{ palette: IPalette }>`
   width: 640px;
   height: 640px;
   border: 4px solid red;
@@ -53,14 +54,25 @@ const StyledImg = styled('img')`
   margin-top: 12px;
 `;
 
-const Fuse = styled('div')<{palette: IPalette}>`
+const FuseContainer = styled('div')`
   width: 100%;
-  height: 1em;
-  background-color: ${props => props.palette.alternativeColor};
+  display: flex;
+  justify-content: flex-end;
   margin-top: 12px;
+  height: 1em;
 `;
 
-const WaterMark = styled('div')<{palette: IPalette}>`
+const ReverseFuse = styled('div')<{ palette: IPalette, progress: number }>`
+  width: ${props => props.progress * 100}%;
+  background-color: ${props => props.palette.color};
+`
+
+const Fuse = styled('div')<{ palette: IPalette, progress: number }>`
+  width: ${props => 100 - (props.progress * 100)}%;
+  background-color: ${props => props.palette.alternativeColor};
+`;
+
+const WaterMark = styled('div') <{ palette: IPalette }>`
   color: ${props => props.palette.color};
   margin-top: 12px;
   width: 100%;
@@ -71,13 +83,22 @@ export const ActionBox = enhance(props => (
   <Style palette={props.palette}>
     <Centered>
       <Text1>
-        {props.songName}
+        {props.text1}
       </Text1>
       <Text2>
-        {props.artistName}
+        {props.text2}
       </Text2>
       <StyledImg src={props.src} />
-      <Fuse palette={props.palette} />
+      <FuseContainer>
+        <ReverseFuse
+          palette={props.palette}
+          progress={props.progress}
+        />
+        <Fuse
+          palette={props.palette}
+          progress={props.progress}
+        />
+      </FuseContainer>
       <WaterMark palette={props.palette}>@jaredplaysguitar</WaterMark>
     </Centered>
   </Style>
