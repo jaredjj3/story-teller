@@ -365,6 +365,7 @@ export const Editor = enhance(props => (
           progress={props.progress}
         />
         <Audio
+          playing={props.playing}
           onCurrentTimeMsChange={props.syncCurrentTimeMs}
           onDurationMsChange={props.syncDurationMs}
           onPlay={props.handlePlay}
