@@ -381,6 +381,8 @@ export const Editor = enhance(props => (
           src={props.imgSrc}
           palette={props.palette}
           onPaletteChange={props.handlePaletteChange}
+          artistName={props.artistName}
+          songName={props.songName}
           text1={props.text1}
           text2={props.text2}
           progress={props.progress}

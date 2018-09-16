@@ -7,9 +7,23 @@ interface IOuterProps {
   src: string;
   progress: number;
   palette: IPalette;
+  artistName: string;
+  songName: string;
   text1: string;
   text2: string;
 }
+
+const getFontSize = (strLength: number) => {
+  if (strLength < 22) {
+    return 1
+  } else if (strLength < 44) {
+    return 0.75;
+  } else if (strLength < 64) {
+    return 0.66;
+  } else {
+    return 0.5;
+  }
+};
 
 const enhance = compose<IOuterProps, IOuterProps>(
 
@@ -26,25 +40,38 @@ const Style = styled('div') <{ palette: IPalette }>`
   justify-content: center;
 `
 
-const Text1 = styled('div')`
-  font-size: 1.5em;
-  height: 1.5em;
-  width: 100%;
-`;
-
-const Text2 = styled('div')`
-  font-size: 1em;
-  height: 1em;
-  width: 100%;
-`;
-
 const Centered = styled('div')`
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  width: 50%;
+  width: 66%;
   margin: 0 auto;
+`;
+
+const TextContainer = styled('div')`
+  width: 100%;
+  position: relative;
+`;
+
+const TextSpacer = styled('div')`
+  opacity: 0;
+`;
+
+const VisibleText = styled('div')`
+  position: absolute;
+  top: 0;
+  left: 0;
+`;
+
+const Text1 = styled('div') <{ length: number }>`
+  font-size: ${props => getFontSize(props.length) * 3}em;
+  width: 100%;
+`;
+
+const Text2 = styled('div') <{ length: number }>`
+  font-size: ${props => getFontSize(props.length) * 2}em;
+  width: 100%;
 `;
 
 const StyledImg = styled('img')`
@@ -62,12 +89,12 @@ const FuseContainer = styled('div')`
   height: 1em;
 `;
 
-const ReverseFuse = styled('div')<{ palette: IPalette, progress: number }>`
+const ReverseFuse = styled('div') <{ palette: IPalette, progress: number }>`
   width: ${props => props.progress * 100}%;
   background-color: ${props => props.palette.color};
 `
 
-const Fuse = styled('div')<{ palette: IPalette, progress: number }>`
+const Fuse = styled('div') <{ palette: IPalette, progress: number }>`
   width: ${props => 100 - (props.progress * 100)}%;
   background-color: ${props => props.palette.alternativeColor};
 `;
@@ -76,18 +103,30 @@ const WaterMark = styled('div') <{ palette: IPalette }>`
   color: ${props => props.palette.color};
   margin-top: 12px;
   width: 100%;
-  font-size: 1em;
+  font-size: 1.5em;
 `;
 
 export const ActionBox = enhance(props => (
   <Style palette={props.palette}>
     <Centered>
-      <Text1>
-        {props.text1}
-      </Text1>
-      <Text2>
-        {props.text2}
-      </Text2>
+      <TextContainer>
+        <TextSpacer>
+          <Text1 length={props.songName.length}>
+            {props.songName}
+          </Text1>
+          <Text2 length={props.songName.length}> {/* we purposefully base the length on songName */}
+            {props.artistName}
+          </Text2>
+        </TextSpacer>
+        <VisibleText>
+          <Text1 length={props.text1.length}>
+            {props.text1}
+          </Text1>
+          <Text2 length={props.text1.length}> {/* we purposefully base the length on text1 */}
+            {props.text2}
+          </Text2>
+        </VisibleText>
+      </TextContainer>
       <StyledImg src={props.src} />
       <FuseContainer>
         <ReverseFuse
