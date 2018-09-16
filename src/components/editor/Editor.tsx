@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Row, Icon, Col, Form, Input, Button, Divider, Upload, InputNumber } from 'antd';
+import { Row, Icon, Col, Form, Input, Button, Upload, InputNumber, Tabs } from 'antd';
 import styled from 'react-emotion';
 import { Preview } from '../preview';
 import { compose, withState, withHandlers, withProps } from 'recompose';
@@ -11,6 +11,7 @@ import { ITextSpec } from 'types/text-spec';
 import { DEFAULT_TEXT_SPECS } from 'constants/DEFAULT_TEXT_SPECS';
 import { loop } from 'enhancers/loop';
 import ButtonGroup from 'antd/lib/button/button-group';
+import { ChromePicker, ColorResult } from 'react-color';
 
 interface IWithStateProps {
   imgSrc: string;
@@ -38,9 +39,9 @@ interface IWithStateProps {
 interface IWithHandlerProps extends IWithStateProps {
   handleSrcChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handlePaletteChange: (palette: IPalette) => void;
-  handleColorChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleBackgroundColorChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleAlternativeColorChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleColorChange: (color: ColorResult) => void;
+  handleBackgroundColorChange: (color: ColorResult) => void;
+  handleAlternativeColorChange: (color: ColorResult) => void;
   resetPalette: (event: React.SyntheticEvent) => void;
   handleTimeMsChange: (timeMs: string | number) => void;
   handleMusicSrcChange: (info: UploadChangeParam) => void
@@ -72,6 +73,11 @@ interface IProgressProps extends ITextProps {
   progress: number;
 }
 
+const colorToString = (color: ColorResult): string => {
+  const { r, g, b, a } = color.rgb;
+  return a ? `rgba(${r}, ${g}, ${b}, ${a})` : `rgba(${r}, ${g}, ${b})`;
+};
+
 const enhance = compose<IProgressProps, {}>(
   withState('imgSrc', 'setImgSrc', 'default_image.jpeg'),
   withState('musicSrc', 'setMusicSrc', 'default_audio.m4a'),
@@ -91,14 +97,14 @@ const enhance = compose<IProgressProps, {}>(
     handlePaletteChange: (props: IWithStateProps) => (palette: IPalette) => {
       props.setPalette({ ...palette });
     },
-    handleColorChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      props.setPalette({ ...props.palette, color: event.currentTarget.value });
+    handleColorChange: (props: IWithStateProps) => (color: ColorResult) => {
+      props.setPalette({ ...props.palette, color: colorToString(color) });
     },
-    handleBackgroundColorChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      props.setPalette({ ...props.palette, backgroundColor: event.currentTarget.value });
+    handleBackgroundColorChange: (props: IWithStateProps) => (color: ColorResult) => {
+      props.setPalette({ ...props.palette, backgroundColor: colorToString(color) });
     },
-    handleAlternativeColorChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      props.setPalette({ ...props.palette, alternativeColor: event.currentTarget.value });
+    handleAlternativeColorChange: (props: IWithStateProps) => (color: ColorResult) => {
+      props.setPalette({ ...props.palette, alternativeColor: colorToString(color) });
     },
     resetPalette: (props: IWithStateProps) => (event: React.SyntheticEvent) => {
       event.preventDefault();
@@ -226,124 +232,118 @@ interface IColorBoxProps {
   color: string;
 }
 
-const ColorBox = styled('div') <IColorBoxProps>`
-  border: 1px solid black;
-  background-color: ${props => props.color};
-  height: 16px;
-  margin-top: 4px;
-`;
-
 export const Editor = enhance(props => (
   <Style>
     <Row gutter={24}>
-      <Col xs={12} sm={12} md={12} lg={4} xl={4} xxl={4}>
-        <Form layout="inline">
-          <h3>main</h3>
-          <Form.Item label="img src">
-            <Input
-              value={props.imgSrc}
-              onChange={props.handleSrcChange}
-            />
-          </Form.Item>
-          <Form.Item label="song">
-            <Input
-              value={props.songName}
-              onChange={props.handleSongNameChange}
-            />
-          </Form.Item>
-          <Form.Item label="artist">
-            <Input
-              value={props.artistName}
-              onChange={props.handleArtistNameChange}
-            />
-          </Form.Item>
-          <Form.Item>
-            <Upload
-              accept="audio/*"
-              multiple={false}
-              defaultFileList={[
-                {
-                  uid: '-1',
-                  name: props.musicSrc,
-                  status: 'done',
-                  url: props.musicSrc,
-                  size: 0,
-                  type: 'file'
-                }
-              ]}
-              onChange={props.handleMusicSrcChange}
-            >
-              <Button>
-                <Icon type="upload" /> upload music
-              </Button>
-            </Upload>
-          </Form.Item>
-          <Divider />
-          <h3>color</h3>
-          <Form.Item label="color">
-            <Input
-              value={props.palette.color}
-              onChange={props.handleColorChange}
-            />
-            <ColorBox color={props.palette.color} />
-          </Form.Item>
-          <Form.Item label="background color">
-            <Input
-              value={props.palette.backgroundColor}
-              onChange={props.handleBackgroundColorChange}
-            />
-            <ColorBox color={props.palette.backgroundColor} />
-          </Form.Item>
-          <Form.Item label="alternative color">
-            <Input
-              value={props.palette.alternativeColor}
-              onChange={props.handleAlternativeColorChange}
-            />
-            <ColorBox color={props.palette.alternativeColor} />
-          </Form.Item>
-          <Form.Item>
-            <Button onClick={props.resetPalette}>
-              <Icon type="reload" /> reset palette
-            </Button>
-          </Form.Item>
-        </Form>
-      </Col>
-      <Col xs={12} sm={12} md={12} lg={4} xl={4} xxl={4}>
-        <h3>text</h3>
-        <Form layout="inline">
-          <Form.Item>
-            <ButtonGroup>
-              <Button onClick={props.addTextSpec}>
-                <Icon type="plus" /> 1
-            </Button>
-              <Button onClick={props.removeTextSpec}>
-                <Icon type="minus" /> 1
-            </Button>
-            </ButtonGroup>
-          </Form.Item>
-          {
-            props.textSpecs.map(({ text, durationMs }, ndx) => (
-              <Form.Item label={`text ${ndx + 1}`} key={`text-spec-${ndx}`}>
+      <Col xs={12} sm={12} md={12} lg={6} xl={6} xxl={6}>
+        <Tabs defaultActiveKey="1">
+          <Tabs.TabPane tab="main" key="1">
+            <Form>
+              <Form.Item label="img src">
                 <Input
-                  value={text}
-                  onChange={props.handleTextSpecTextChange(ndx)}
-                />
-                <InputNumber
-                  min={0}
-                  value={durationMs}
-                  onChange={props.handleTextSpecDurationMsChange(ndx)}
+                  value={props.imgSrc}
+                  onChange={props.handleSrcChange}
                 />
               </Form.Item>
-            ))
-          }
-          <Form.Item>
-            <Button type="danger" onClick={props.clearTextSpecs}>
-              remove all
+              <Form.Item label="song">
+                <Input
+                  value={props.songName}
+                  onChange={props.handleSongNameChange}
+                />
+              </Form.Item>
+              <Form.Item label="artist">
+                <Input
+                  value={props.artistName}
+                  onChange={props.handleArtistNameChange}
+                />
+              </Form.Item>
+              <Form.Item>
+                <Upload
+                  accept="audio/*"
+                  multiple={false}
+                  defaultFileList={[
+                    {
+                      uid: '-1',
+                      name: props.musicSrc,
+                      status: 'done',
+                      url: props.musicSrc,
+                      size: 0,
+                      type: 'file'
+                    }
+                  ]}
+                  onChange={props.handleMusicSrcChange}
+                >
+                  <Button>
+                    <Icon type="upload" /> upload music
+              </Button>
+                </Upload>
+              </Form.Item>
+            </Form>
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="color" key="2">
+            <Form>
+              <Form.Item label="color">
+                <ChromePicker
+                  onChange={props.handleColorChange}
+                  color={props.palette.color}
+                />
+              </Form.Item>
+              <Form.Item label="background color">
+                <ChromePicker
+                  onChange={props.handleBackgroundColorChange}
+                  color={props.palette.backgroundColor}
+                />
+              </Form.Item>
+              <Form.Item label="alternative color">
+                <ChromePicker
+                  onChange={props.handleAlternativeColorChange}
+                  color={props.palette.alternativeColor}
+                />
+              </Form.Item>
+              <Form.Item>
+                <Button onClick={props.resetPalette}>
+                  <Icon type="reload" /> reset palette
+            </Button>
+              </Form.Item>
+            </Form>
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="text" key="3">
+            <Form layout="inline">
+              <Form.Item>
+                <ButtonGroup>
+                  <Button onClick={props.addTextSpec}>
+                    <Icon type="plus" /> 1
+                  </Button>
+                  <Button onClick={props.removeTextSpec}>
+                    <Icon type="minus" /> 1
+                  </Button>
+                </ButtonGroup>
+              </Form.Item>
+              {
+                props.textSpecs.map(({ text, durationMs }, ndx) => (
+                  <Form.Item label={`text ${ndx + 1}`} key={`text-spec-${ndx}`}>
+                    <Input
+                      value={text}
+                      onChange={props.handleTextSpecTextChange(ndx)}
+                    />
+                    <InputNumber
+                      min={0}
+                      value={durationMs}
+                      onChange={props.handleTextSpecDurationMsChange(ndx)}
+                    />
+                  </Form.Item>
+                ))
+              }
+              <Form.Item>
+                <Button type="danger" onClick={props.clearTextSpecs}>
+                  remove all
           </Button>
-          </Form.Item>
-        </Form>
+              </Form.Item>
+            </Form>
+          </Tabs.TabPane>
+        </Tabs>
       </Col>
-      <Col xs={24} sm={24} md={24} lg={14} xl={14} xxl={14}>
+      <Col xs={24} sm={24} md={24} lg={16} xl={16} xxl={16}>
         <Preview
           src={props.imgSrc}
           palette={props.palette}
@@ -363,5 +363,5 @@ export const Editor = enhance(props => (
         />
       </Col>
     </Row>
-  </Style>
+  </Style >
 ));
