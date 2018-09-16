@@ -138,7 +138,6 @@ const enhance = compose<IProgressProps, {}>(
     },
     handlePause: (props: IWithStateProps) => () => {
       props.setPlaying(false);
-      props.setTextSpecNdx(0);
     },
     addTextSpec: (props: IWithStateProps) => () => {
       const nextTextSpecs: ITextSpec[] = props.textSpecs.map(textSpec => ({ ...textSpec }));
@@ -175,11 +174,15 @@ const enhance = compose<IProgressProps, {}>(
     handleArtistNameChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
       props.setArtistName(event.currentTarget.value);
     },
-    syncCurrentTimeMs: (props: IWithStateProps) => (timeMs: number) => {
-      props.setCurrentTimeMs(timeMs);
+    syncCurrentTimeMs: (props: IWithStateProps) => (currentTimeMs: number) => {
+      if (props.currentTimeMs !== currentTimeMs) {
+        props.setCurrentTimeMs(currentTimeMs);
+      }
     },
     syncDurationMs: (props: IWithStateProps) => (durationMs: number) => {
-      props.setDurationMs(durationMs);
+      if (props.durationMs !== durationMs) {
+        props.setDurationMs(durationMs);
+      }
     }
   }),
   withProps((props: IWithHandlerProps) => {
@@ -365,7 +368,6 @@ export const Editor = enhance(props => (
           progress={props.progress}
         />
         <Audio
-          playing={props.playing}
           onCurrentTimeMsChange={props.syncCurrentTimeMs}
           onDurationMsChange={props.syncDurationMs}
           onPlay={props.handlePlay}

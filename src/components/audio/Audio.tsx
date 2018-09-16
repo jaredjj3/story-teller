@@ -6,7 +6,6 @@ import { Button, Icon } from 'antd';
 
 interface IOuterProps {
   src: string;
-  playing: boolean;
   onPlay: () => void;
   onPause: () => void;
   onCurrentTimeMsChange: (timeMs: number) => void;
@@ -52,7 +51,7 @@ const enhance = compose <IWithHandlerProps, IOuterProps>(
   }),
   branch<IOuterProps>(props => !props.src, renderNothing),
   loop<IWithHandlerProps>(props => {
-    if (!props.audioElement || !props.playing) {
+    if (!props.audioElement) {
       return;
     }
 
