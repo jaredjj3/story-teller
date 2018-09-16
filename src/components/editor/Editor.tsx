@@ -241,7 +241,7 @@ const SliderMargin = styled('div')`
 export const Editor = enhance(props => (
   <Style>
     <Row gutter={24}>
-      <Col xs={12} sm={12} md={12} lg={6} xl={6} xxl={6}>
+      <Col xs={24} sm={24} md={24} lg={6} xl={6} xxl={6}>
         <Tabs defaultActiveKey="1">
           <Tabs.TabPane tab="main" key="1">
             <Form>
