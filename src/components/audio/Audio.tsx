@@ -30,21 +30,9 @@ const enhance = compose <IWithHandlerProps, IOuterProps>(
     },
     handlePlay: (props: IWithStateProps) => () => {
       props.onPlay();
-      
-      if (!props.audioElement) {
-        return;
-      }
-
-      props.audioElement.currentTime = 0;
     },
     handlePause: (props: IWithStateProps) => () => {
       props.onPause();
-      
-      if (!props.audioElement) {
-        return;
-      }
-
-      props.audioElement.currentTime = 0;
     },
   }),
   branch<IOuterProps>(props => !props.src, renderNothing),

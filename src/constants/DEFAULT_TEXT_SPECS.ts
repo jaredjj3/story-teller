@@ -2,28 +2,26 @@ import { ITextSpec } from '../types/text-spec';
 
 export const DEFAULT_TEXT_SPECS: ITextSpec[] = [
   {
+    text: '',
+    durationMs: 650
+  },
+  {
     text: 'good things take time',
-    from: 650,
-    to: 4000
+    durationMs: 3350
   }, {
     text: '',
-    from: 4000,
-    to: 5850
+    durationMs: 1850
   }, {
     text: 'don\'t',
-    from: 5850,
-    to: 6750
+    durationMs: 900
   }, {
     text: 'don\'t rush',
-    from: 6750,
-    to: 7650
+    durationMs: 900
   }, {
     text: 'don\'t rush anything',
-    from: 7650,
-    to: 9250
+    durationMs: 600
   }, {
     text: '',
-    from: 9850,
-    to: 10850
+    durationMs: 1000
   }
 ];

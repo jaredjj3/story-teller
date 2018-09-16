@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Row, Icon, Col, Form, Input, Button, Divider, InputNumber, Upload } from 'antd';
+import { Row, Icon, Col, Form, Input, Button, Divider, Upload, InputNumber } from 'antd';
 import styled from 'react-emotion';
 import { Preview } from '../preview';
 import { compose, withState, withHandlers, withProps } from 'recompose';
@@ -11,6 +11,7 @@ import { ITextSpec } from 'types/text-spec';
 import { last, get } from 'lodash';
 import { DEFAULT_TEXT_SPECS } from 'constants/DEFAULT_TEXT_SPECS';
 import { loop } from 'enhancers/loop';
+import ButtonGroup from 'antd/lib/button/button-group';
 
 interface IWithStateProps {
   imgSrc: string;
@@ -48,9 +49,9 @@ interface IWithHandlerProps extends IWithStateProps {
   handlePause: () => void;
   addTextSpec: () => void;
   removeTextSpec: () => void;
-  handleTextSpecTextChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleTextSpecFromChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleTextSpecToChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  clearTextSpecs: () => void;
+  handleTextSpecTextChange: (ndx: number) => (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleTextSpecDurationMsChange: (ndx: number) => (value: number | string) => void;
   handleSongNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleArtistNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   syncCurrentTimeMs: (currentTimeMs: number) => void;
@@ -59,6 +60,8 @@ interface IWithHandlerProps extends IWithStateProps {
 
 interface ICurrentTextSpecProps extends IWithHandlerProps {
   currentTextSpec: ITextSpec | null;
+  currentTextSpecFrom: number | null;
+  currentTextSpecTo: number | null;
 }
 
 interface ITextProps extends ICurrentTextSpecProps {
@@ -121,10 +124,8 @@ const enhance = compose<IProgressProps, {}>(
     },
     addTextSpec: (props: IWithStateProps) => () => {
       const nextTextSpecs: ITextSpec[] = props.textSpecs.map(textSpec => ({ ...textSpec }));
-      const from: number = get(last(nextTextSpecs), 'to', 1000);
-      const to: number = from + 5000;
 
-      nextTextSpecs.push({ text: '', from, to });
+      nextTextSpecs.push({ text: '', durationMs: 1000 });
 
       props.setTextSpecs(nextTextSpecs);
     },
@@ -135,73 +136,24 @@ const enhance = compose<IProgressProps, {}>(
 
       props.setTextSpecs(nextTextSpecs);
     },
-    handleTextSpecTextChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      const { currentTarget } = event;
-      const ndx = currentTarget.getAttribute('data-ndx');
-
-      if (!ndx) {
-        return;
-      }
-
+    clearTextSpecs: (props: IWithStateProps) => () => {
+      props.setTextSpecs([]);
+    },
+    handleTextSpecTextChange: (props: IWithStateProps) => (ndx: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
       const nextTextSpecs = props.textSpecs.map(textSpec => ({ ...textSpec }));
-      nextTextSpecs[ndx].text = currentTarget.value;
+      nextTextSpecs[ndx].text = event.currentTarget.value;
 
       props.setTextSpecs(nextTextSpecs);
     },
-    handleTextSpecFromChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      const { currentTarget } = event;
-      const ndx = currentTarget.getAttribute('data-ndx');
+    handleTextSpecDurationMsChange: (props: IWithStateProps) => (ndx: number) => (value: string | number) => {
+      const durationMs = typeof value === 'string' ? parseInt(value, 10) : value;
 
-      if (!ndx) {
-        return;
-      }
-
-      const from = parseInt(currentTarget.value, 10);
-
-      if (isNaN(from)) {
+      if (isNaN(durationMs)) {
         return;
       }
 
       const nextTextSpecs = props.textSpecs.map(textSpec => ({ ...textSpec }));
-      nextTextSpecs[ndx].from = from;
-
-      props.setTextSpecs(nextTextSpecs);
-    },
-    handleTextSpecToChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      const { currentTarget } = event;
-      const dataNdx = currentTarget.getAttribute('data-ndx');
-
-      if (!dataNdx) {
-        return;
-      }
-
-      const ndx = parseInt(dataNdx, 10);
-      const to = parseInt(currentTarget.value, 10);
-
-      if (isNaN(to)) {
-        return;
-      }
-
-      // TODO: Preserve deltas between specs and within specs
-      const nextTextSpecs = props.textSpecs.map(textSpec => ({ ...textSpec }));
-      const currSpec = nextTextSpecs[ndx];
-
-      currSpec.to = to;
-
-      // adjust the specs so they don't overlap
-      nextTextSpecs.forEach((spec, specNdx, self) => {
-        const prevSpec = self[specNdx - 1];
-
-        if (!prevSpec) {
-          return;
-        }
-
-        if (spec.from < prevSpec.to) {
-          const delta = spec.to - spec.from;
-          spec.from = prevSpec.to;
-          spec.to = spec.from + delta;
-        }
-      })
+      nextTextSpecs[ndx].durationMs = durationMs;
 
       props.setTextSpecs(nextTextSpecs);
     },
@@ -218,19 +170,31 @@ const enhance = compose<IProgressProps, {}>(
       props.setDurationMs(durationMs);
     }
   }),
-  withProps((props: IWithHandlerProps) => ({
-    currentTextSpec: props.textSpecs[props.textSpecNdx] || null
-  })),
+  withProps((props: IWithHandlerProps) => {
+    const currentTextSpec = props.textSpecs[props.textSpecNdx] || null;
+    let currentTextSpecFrom: number | null = null;
+    let currentTextSpecTo: number | null = null;
+
+    if (currentTextSpec) {
+      const prevTextSpecs = props.textSpecs.slice(undefined, props.textSpecNdx);
+      currentTextSpecFrom = prevTextSpecs.reduce((totalDurationMs, textSpec) => (
+        totalDurationMs + textSpec.durationMs
+      ), 0);
+      currentTextSpecTo = currentTextSpecFrom + currentTextSpec.durationMs
+    }
+
+    return { currentTextSpec, currentTextSpecFrom, currentTextSpecTo }
+  }),
   withProps((props: ICurrentTextSpecProps) => {
     let text1: string = '';
     let text2: string = '';
 
-    const { currentTextSpec, currentTimeMs, songName, artistName } = props;
+    const { currentTextSpec, songName, artistName } = props;
 
     if (!currentTextSpec) {
       text1 = songName;
       text2 = artistName;
-    } else if (currentTextSpec.from < currentTimeMs && currentTextSpec.to > currentTimeMs) {
+    } else {
       text1 = currentTextSpec.text;
     }
 
@@ -244,7 +208,11 @@ const enhance = compose<IProgressProps, {}>(
       return;
     }
 
-    if (props.currentTimeMs > props.currentTextSpec.to) {
+    if (typeof props.currentTextSpecTo !== 'number') {
+      return;
+    }
+
+    if (props.currentTimeMs > props.currentTextSpecTo) {
       props.setTextSpecNdx(props.textSpecNdx + 1);
     }
   })
@@ -334,9 +302,7 @@ export const Editor = enhance(props => (
             <ColorBox color={props.palette.alternativeColor} />
           </Form.Item>
           <Form.Item>
-            <Button
-              onClick={props.resetPalette}
-            >
+            <Button onClick={props.resetPalette}>
               <Icon type="reload" /> reset palette
             </Button>
           </Form.Item>
@@ -344,37 +310,37 @@ export const Editor = enhance(props => (
       </Col>
       <Col xs={12} sm={12} md={12} lg={4} xl={4} xxl={4}>
         <h3>text</h3>
-        <Button
-          onClick={props.addTextSpec}
-        >
-          <Icon type="plus" /> text
-          </Button>
-        <Button
-          onClick={props.removeTextSpec}
-        >
-          <Icon type="minus" /> text
-          </Button>
+        <Form.Item>
+          <ButtonGroup>
+            <Button onClick={props.addTextSpec}>
+              <Icon type="plus" /> 1
+            </Button>
+            <Button onClick={props.removeTextSpec}>
+              <Icon type="minus" /> 1
+            </Button>
+          </ButtonGroup>
+        </Form.Item>
         {
-          props.textSpecs.map(({ text, from, to }, ndx) => (
+          props.textSpecs.map(({ text, durationMs }, ndx) => (
             <Form.Item label={`text ${ndx + 1}`} key={`text-spec-${ndx}`}>
               <Input
-                data-ndx={ndx}
                 value={text}
-                onChange={props.handleTextSpecTextChange}
+                onChange={props.handleTextSpecTextChange(ndx)}
               />
-              <Input
-                data-ndx={ndx}
-                value={from}
-                onChange={props.handleTextSpecFromChange}
-              />
-              <Input
-                data-ndx={ndx}
-                value={to}
-                onChange={props.handleTextSpecToChange}
+              <InputNumber
+                min={0}
+                step={10}
+                value={durationMs}
+                onChange={props.handleTextSpecDurationMsChange(ndx)}
               />
             </Form.Item>
           ))
         }
+        <Form.Item>
+          <Button type="danger" onClick={props.clearTextSpecs}>
+            remove all
+          </Button>
+        </Form.Item>
       </Col>
       <Col xs={24} sm={24} md={24} lg={14} xl={14} xxl={14}>
         <Preview
