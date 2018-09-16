@@ -169,20 +169,39 @@ const enhance = compose<IProgressProps, {}>(
     },
     handleTextSpecToChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
       const { currentTarget } = event;
-      const ndx = currentTarget.getAttribute('data-ndx');
+      const dataNdx = currentTarget.getAttribute('data-ndx');
 
-      if (!ndx) {
+      if (!dataNdx) {
         return;
       }
 
+      const ndx = parseInt(dataNdx, 10);
       const to = parseInt(currentTarget.value, 10);
 
       if (isNaN(to)) {
         return;
       }
 
+      // TODO: Preserve deltas between specs and within specs
       const nextTextSpecs = props.textSpecs.map(textSpec => ({ ...textSpec }));
-      nextTextSpecs[ndx].to = to;
+      const currSpec = nextTextSpecs[ndx];
+
+      currSpec.to = to;
+
+      // adjust the specs so they don't overlap
+      nextTextSpecs.forEach((spec, specNdx, self) => {
+        const prevSpec = self[specNdx - 1];
+
+        if (!prevSpec) {
+          return;
+        }
+
+        if (spec.from < prevSpec.to) {
+          const delta = spec.to - spec.from;
+          spec.from = prevSpec.to;
+          spec.to = spec.from + delta;
+        }
+      })
 
       props.setTextSpecs(nextTextSpecs);
     },
