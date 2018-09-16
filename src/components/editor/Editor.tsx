@@ -15,19 +15,19 @@ interface IWithStateProps {
   imgSrc: string;
   musicSrc: any;
   palette: IPalette;
-  timeMs: number;
   playing: boolean;
   textSpecs: ITextSpec[];
   songName: string;
   artistName: string;
+  currentTimeMs: number;
   setPalette: (palette: IPalette) => void;
   setImgSrc: (src: string) => void;
-  setTimeMs: (timeMs: number) => void;
   setMusicSrc: (musicSrc: string) => void;
   setPlaying: (playing: boolean) => void;
   setTextSpecs: (textSpecs: ITextSpec[]) => void;
   setSongName: (songName: string) => void;
   setArtistName: (artistName: string) => void;
+  setCurrentTimeMs: (currentTimeMs: number) => void;
 }
 
 interface IWithHandlerProps extends IWithStateProps {
@@ -48,6 +48,7 @@ interface IWithHandlerProps extends IWithStateProps {
   handleTextSpecToChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleSongNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleArtistNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  syncCurrentTimeMs: (currentTimeMs: number) => void;
 }
 
 const enhance = compose<IWithHandlerProps, {}>(
@@ -59,6 +60,7 @@ const enhance = compose<IWithHandlerProps, {}>(
   withState('textSpecs', 'setTextSpecs', DEFAULT_TEXT_SPECS),
   withState('songName', 'setSongName', 'night time blues'),
   withState('artistName', 'setArtistName', 'castelluzzo'),
+  withState('currentTimeMs', 'setCurrentTimeMs', 0),
   withHandlers({
     handleSrcChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
       props.setImgSrc(event.currentTarget.value);
@@ -80,13 +82,6 @@ const enhance = compose<IWithHandlerProps, {}>(
       const { imgSrc } = props;
       props.setImgSrc('');
       window.setTimeout(() => props.setImgSrc(imgSrc), 0);
-    },
-    handleTimeMsChange: (props: IWithStateProps) => (timeMs: string | number) => {
-      const nextTimeMs = typeof timeMs === 'string' ? parseInt(timeMs, 10) : timeMs;
-
-      if (!isNaN(nextTimeMs)) {
-        props.setTimeMs(nextTimeMs);
-      }
     },
     handleMusicSrcChange: (props: IWithStateProps) => (info: UploadChangeParam) => {
       try {
@@ -174,6 +169,9 @@ const enhance = compose<IWithHandlerProps, {}>(
     },
     handleArtistNameChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
       props.setArtistName(event.currentTarget.value);
+    },
+    syncCurrentTimeMs: (props: IWithStateProps) => (timeMs: number) => {
+      props.setCurrentTimeMs(timeMs);
     }
   })
 );
@@ -219,14 +217,6 @@ export const Editor = enhance(props => (
               value={props.artistName}
               onChange={props.handleArtistNameChange}
             />
-          </Form.Item>
-          <Form.Item label="time ms">
-            <InputNumber
-              disabled={props.playing}
-              min={1}
-              step={1}
-              value={props.timeMs}
-              onChange={props.handleTimeMsChange} />
           </Form.Item>
           <Form.Item>
             <Upload
@@ -331,6 +321,7 @@ export const Editor = enhance(props => (
           onPaletteChange={props.handlePaletteChange}
         />
         <Audio
+          syncCurrentTimeMs={props.syncCurrentTimeMs}
           onPlay={props.handlePlay}
           onPause={props.handlePause}
           src={props.musicSrc}
