@@ -2,7 +2,7 @@ import { ITextSpec } from '../types/text-spec';
 
 export const DEFAULT_TEXT_SPECS: ITextSpec[] = [
   {
-    text: '',
+    text: 'yo',
     durationMs: 650
   },
   {
