@@ -55,6 +55,7 @@ interface IWithHandlerProps extends IWithStateProps {
   handleArtistNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   syncCurrentTimeMs: (currentTimeMs: number) => void;
   syncDurationMs: (durationMs: number) => void;
+  setTextSpecsFromLocalStorage: () => void;
 }
 
 interface ICurrentTextSpecProps extends IWithHandlerProps {
@@ -89,6 +90,10 @@ const colorToString = (color: ColorResult): string => {
   const { r, g, b, a } = color.rgb;
   return a ? `rgba(${r}, ${g}, ${b}, ${a})` : `rgba(${r}, ${g}, ${b})`;
 };
+
+const storeTextSpecs = (textSpecs: ITextSpec[]) => {
+  window.localStorage.setItem('lastTextSpecs', JSON.stringify(textSpecs));
+}
 
 const enhance = compose<IProgressProps, {}>(
   withState('imgSrc', 'setImgSrc', 'default_image.jpeg'),
@@ -139,12 +144,17 @@ const enhance = compose<IProgressProps, {}>(
     handlePause: (props: IWithStateProps) => () => {
       props.setPlaying(false);
     },
+    setTextSpecsFromLocalStorage: (props: IWithStateProps) => () => {
+      const textSpecs: ITextSpec[] = JSON.parse(window.localStorage.getItem('lastTextSpecs') || '[]');
+      props.setTextSpecs(textSpecs);
+    },
     addTextSpec: (props: IWithStateProps) => () => {
       const nextTextSpecs: ITextSpec[] = props.textSpecs.map(textSpec => ({ ...textSpec }));
 
       nextTextSpecs.push({ text: '', durationMs: 3000 });
 
       props.setTextSpecs(nextTextSpecs);
+      storeTextSpecs(nextTextSpecs);
     },
     removeTextSpec: (props: IWithStateProps) => () => {
       const nextTextSpecs: ITextSpec[] = props.textSpecs.map(textSpec => ({ ...textSpec }));
@@ -152,6 +162,7 @@ const enhance = compose<IProgressProps, {}>(
       nextTextSpecs.pop();
 
       props.setTextSpecs(nextTextSpecs);
+      storeTextSpecs(nextTextSpecs);
     },
     clearTextSpecs: (props: IWithStateProps) => () => {
       props.setTextSpecs([]);
@@ -161,12 +172,14 @@ const enhance = compose<IProgressProps, {}>(
       nextTextSpecs[ndx].text = event.currentTarget.value;
 
       props.setTextSpecs(nextTextSpecs);
+      storeTextSpecs(nextTextSpecs);
     },
     handleTextSpecDurationMsChange: (props: IWithStateProps) => (ndx: number) => (value: number) => {
       const nextTextSpecs = props.textSpecs.map(textSpec => ({ ...textSpec }));
       nextTextSpecs[ndx].durationMs = value;
 
       props.setTextSpecs(nextTextSpecs);
+      storeTextSpecs(nextTextSpecs);
     },
     handleSongNameChange: (props: IWithStateProps) => (event: React.ChangeEvent<HTMLInputElement>) => {
       props.setSongName(event.currentTarget.value);
@@ -334,6 +347,11 @@ export const Editor = enhance(props => (
                 >
                   remove all
                 </Button>
+              </Form.Item>
+              <Form.Item>
+                  <Button onClick={props.setTextSpecsFromLocalStorage}>
+                    restore
+                  </Button>
               </Form.Item>
               {
                 props.textSpecs.map(({ text, durationMs }, ndx) => (
