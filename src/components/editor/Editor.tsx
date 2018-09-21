@@ -297,7 +297,7 @@ export const Editor = enhance(props => (
                 >
                   <Button>
                     <Icon type="upload" /> upload music
-              </Button>
+                  </Button>
                 </Upload>
               </Form.Item>
             </Form>
@@ -360,6 +360,7 @@ export const Editor = enhance(props => (
                       value={text}
                       onChange={props.handleTextSpecTextChange(ndx)}
                     />
+                    {/*TODO: Add a play button that allows playing from a certain textSpec*/}
                     <SliderMargin>
                       <Slider
                         min={0}
